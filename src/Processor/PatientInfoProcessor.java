@@ -56,6 +56,8 @@ public class PatientInfoProcessor {
     String XZZ = keywords[22];
     String maskAddr = Mask.MaskAddr.run(XZZ);
     print(maskAddr);
+    // print the end of line
+    print("\n");
   }
 
   public static void process(final File file) throws IOException, NoSuchAlgorithmException {
