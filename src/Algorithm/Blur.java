@@ -15,9 +15,9 @@ public class Blur{
 			
 			int year = Integer.parseInt(ymdString[0]);
 			if(ymdString[0].length()==2) {
-				if (year<0 || year>22) isStandard=false;
+				if ((year<0 || year>22) && (year<49)) isStandard=false;
 			} else {
-				if (year<2000 || year>2022) isStandard=false;
+				if (year<1949 || year>2022) isStandard=false;
 			}
 			
 			int month = Integer.parseInt(ymdString[1]);
