@@ -10,8 +10,8 @@ java Demo;
 ### Iterface for Blur Algorithm on Time
 In **src/** directory, run the following command:
 ```
-javac Demo_BlurTime.java;
-java Demo_BlurTime;
+javac Demo/Demo_BlurTime.java;
+java Demo/Demo_BlurTime;
 ```
 Explanation for Blur Algorithm on Time:
 ```

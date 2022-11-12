@@ -1,3 +1,4 @@
 *.class
 .idea/
 Data_Deidentification.iml
+*_deidentification.txt

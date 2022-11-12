@@ -1,3 +1,5 @@
+package Demo;
+
 import Processor.PatientInfoProcessor;
 
 import java.io.File;
@@ -13,8 +15,8 @@ class Demo {
                 break;
             }
             default: {
-                System.out.format("We don't know how to process data file %s!", fileName);
-                System.exit(-1);
+                System.out.format("We don't know how to process data file %s!\n", fileName);
+//                System.exit(-1);
             }
         }
     }
