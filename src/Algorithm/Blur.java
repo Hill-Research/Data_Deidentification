@@ -210,4 +210,11 @@ public class Blur{
 			return StandardTimes;
 		}
 	}
+
+	//TODO: blur age
+	public class BlurAge extends Blur {
+		public static String run(String age) {
+			return age;
+		}
+	}
 }
