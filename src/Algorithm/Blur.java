@@ -15,17 +15,18 @@ public class Blur{
 			
 			int year = Integer.parseInt(ymdString[0]);
 			if(ymdString[0].length()==2) {
-				if ((year<0 || year>22) && (year<49)) isStandard=false;
+				if (year>48 && year<49) isStandard=false;
 			} else {
-				if (year<1949 || year>2022) isStandard=false;
+				if (year<1949 || year>2048) isStandard=false;
 			}
 			
 			int month = Integer.parseInt(ymdString[1]);
-			if(month <= 0 || month > 12) isStandard=false;
+			if(month == 0 || month > 12) isStandard=false;
 			
 			int day = Integer.parseInt(ymdString[2]);
 			if (isStandard) {
-				year = (year<2000) ? year : year+2000;
+				year = (year >= 1900) ? year : year + 1900;
+				year = (year >= 1949) ? year : year + 100;
 				int[] days;
 				if((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
 					days = daysLeapYear;
@@ -143,7 +144,10 @@ public class Blur{
 				for(int k = 0; k < count; k++) {
 					String TimeElement = StandardTimeSeries[k];
 					int Time = Integer.parseInt(TimeElement);
-					if(k==0 && Time<23) Time+=2000;
+					if(k==0) {
+						Time = (Time >= 1900) ? Time : Time + 1900;
+						Time = (Time >= 1949) ? Time : Time + 100;
+					}
 					StandardTimeBuffer.append(Time);
 					StandardTimeBuffer.append(linkWord[k]);
 				}
@@ -186,7 +190,12 @@ public class Blur{
 					StringBuffer StandardTimeBuffer = new StringBuffer();
 					for(int k = 0; k < count; k++) {
 						String TimeElement = StandardTimeSeries[k];
-						StandardTimeBuffer.append(TimeElement);
+						int Time = Integer.parseInt(TimeElement);
+						if(k==0) {
+							Time = (Time >= 1900) ? Time : Time + 1900;
+							Time = (Time >= 1949) ? Time : Time + 100;
+						}
+						StandardTimeBuffer.append(Time);
 						StandardTimeBuffer.append(linkWord[k]);
 					}
 					StandardTime = StandardTimeBuffer.toString();
