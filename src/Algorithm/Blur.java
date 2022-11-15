@@ -144,11 +144,11 @@ public class Blur{
 		}
 	}
 	
-	public static class BlurAge extends Blur {
-		private static int getStandardAge(String input) {
-			String Age = input.replaceAll("[^0-9]","");
-			int standardAgeValue = Integer.parseInt(Age);
-			return standardAgeValue;
+	public static class BlurNumber extends Blur {
+		private static int getStandardNumber(String input) {
+			String Number = input.replaceAll("[^0-9]","");
+			int standardNumberValue = Integer.parseInt(Number);
+			return standardNumberValue;
 		}
 		
 		public static String blur(String input) throws NoSuchAlgorithmException{
@@ -163,10 +163,10 @@ public class Blur{
 		
 		public static String blur(String input, String level) throws NoSuchAlgorithmException {
 			int count = Integer.parseInt(level);
-			int standardAgeValue = getStandardAge(input);
-			int period = standardAgeValue / count;
-			String standardAge = String.format("%d岁-%d岁",period*count,(period+1)*count);
-			return standardAge;
+			int standardNumberValue = getStandardNumber(input);
+			int period = standardNumberValue / count;
+			String standardNumber = String.format("%d-%d",period*count,(period+1)*count);
+			return standardNumber;
 		}
 	}
 }
