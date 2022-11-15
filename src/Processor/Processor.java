@@ -17,21 +17,33 @@ import java.util.Map;
 public class Processor {
 
   private BufferedWriter bw;
-  private final Map<String, Integer> algoMap = new LinkedHashMap<>();
 
-  private void generateOutput(final String fileName) throws IOException {
-    File resultFold = new File("../data/result/");
+  public Processor() {
+    File resultFold = new File("../data/result");
     if (resultFold.exists()) {
+      String[] files = resultFold.list();
+      if (files != null) {
+        for (String file : files) {
+          File currentFile = new File(resultFold.getPath(), file);
+          if (!currentFile.delete()) {
+            System.out.printf("Fail to delete the history result file %s!\n", currentFile);
+            System.exit(-1);
+          }
+        }
+      }
+
       if (!resultFold.delete()) {
-        System.out.printf("Fail to delete the result directory for %s!\n", fileName);
+        System.out.print("Fail to delete the result directory!\n");
         System.exit(-1);
       }
     }
     if (!resultFold.mkdirs()) {
-      System.out.printf("Fail to create the result directory for %s!\n", fileName);
+      System.out.print("Fail to create the result directory!\n");
       System.exit(-1);
     }
+  }
 
+  private void generateOutput(final String fileName) throws IOException {
     File deIdFile = new File("../data/result/" + fileName);
     if (deIdFile.exists()) {
       if (!deIdFile.delete()) {
@@ -52,7 +64,7 @@ public class Processor {
     bw.write(" ");
   }
 
-  private void readAlgo(final String fileName) throws IOException {
+  private void readAlgo(final String fileName, Map<String, Integer> algoMap) throws IOException {
     File algoFile = new File("../data/algo/" + fileName);
     BufferedReader algoReader = new BufferedReader(new FileReader(algoFile));
     String record;
@@ -62,16 +74,26 @@ public class Processor {
     }
   }
 
-  private void readData(final String fileName) throws IOException, NoSuchAlgorithmException {
+  private void readData(final String fileName, Map<String, Integer> algoMap)
+      throws IOException, NoSuchAlgorithmException {
     File dataFile = new File("../data/sample/" + fileName);
     BufferedReader dataReader = new BufferedReader(new FileReader(dataFile));
-    String record;
-    while ((record = dataReader.readLine()) != null) {
+
+    Mask.MaskLocation.setLocationsName();
+    String record = dataReader.readLine();
+    while ((record != null) && !record.isEmpty()) {
       String[] keywords = record.split("\\s+");
       int numKeywords = keywords.length;
-      if (numKeywords != algoMap.size()) {
-        System.out.print("Data file and algo file have mismatched number of records!\n");
-        System.exit(-1);
+      int algoSize = algoMap.size();
+      if (numKeywords != algoSize) {
+        System.out.printf("%s (%d) and its algo file (%d) have mismatched number of records!\n",
+            fileName, numKeywords, algoSize);
+        System.out.printf("record: %s\n", record);
+        for (int i = 0; i < numKeywords; i++) {
+          System.out.printf("%d: %s\n", i+3, keywords[i]);
+        }
+        return;
+//        System.exit(-1);
       }
       int index = 0;
       for (Map.Entry<String, Integer> algoMapIt : algoMap.entrySet()) {
@@ -90,11 +112,11 @@ public class Processor {
             print(blurTime);
             break;
           case 3:
-            String blurAge = Blur.BlurAge.run(keyword);
+            String blurAge = Blur.BlurAge.blur(keyword);
             print(blurAge);
             break;
           case 4:
-            String maskAddr = Mask.MaskAddr.run(keyword);
+            String maskAddr = Mask.MaskLocation.mask(keyword);
             print(maskAddr);
             break;
           case 5:
@@ -108,13 +130,17 @@ public class Processor {
         index++;
       }
       print("\n");
+      record = dataReader.readLine();
     }
   }
 
   public void process(final String fileName) throws IOException, NoSuchAlgorithmException {
-    generateOutput(fileName + "_deid.txt");
-    readAlgo(fileName + "_algo.txt");
-    readData(fileName + ".txt");
+    String baseName = fileName.substring(0, fileName.length() - 4);
+    System.out.printf("fileName: %s, base: %s\n", fileName, baseName);
+    generateOutput(baseName + "_deid.txt");
+    Map<String, Integer> algoMap = new LinkedHashMap<>();
+    readAlgo(baseName + "_algo.txt", algoMap);
+    readData(baseName + ".txt", algoMap);
     bw.close();
   }
 }

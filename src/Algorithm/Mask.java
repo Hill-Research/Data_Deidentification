@@ -14,10 +14,14 @@ public class Mask {
 	public class MaskLocation {
 		@SuppressWarnings("rawtypes")
 		static HashMap<String,HashMap> base = null;
-		
+
+		public MaskLocation() throws NoSuchAlgorithmException {
+			setLocationsName();
+		}
+
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public static void setLocationsName() throws NoSuchAlgorithmException{
-			final File file = new File("data/location.csv");
+			final File file = new File("../data/location.csv");
 			file.setReadable(true);
 		    BufferedReader reader;
 	        HashMap<String, HashMap> china = new HashMap<String, HashMap>();
@@ -25,9 +29,9 @@ public class Mask {
 				reader = new BufferedReader(new FileReader(file));
 		        String record = null;
 		        
-		        HashMap<String, HashMap> provience = null;
+		        HashMap<String, HashMap> province = null;
 		        HashMap<String, HashMap> city = null;
-		        String provienceName = null;
+		        String provinceName = null;
 		        String cityName = null;
 		        String countryName = null;
 		        while ((record = reader.readLine()) != null) {
@@ -42,14 +46,14 @@ public class Mask {
 		            if(name.equals("市辖区") || name.equals( "直辖区") || name.equals("直辖县")) continue;
 		            switch(level) {
 			            case 0:
-			            	provienceName = simpliedName+","+linkWord;
-			            	china.put(provienceName, new HashMap<String, HashMap>());
-			            	provience = china.get(provienceName);
+			            	provinceName = simpliedName+","+linkWord;
+			            	china.put(provinceName, new HashMap<String, HashMap>());
+			            	province = china.get(provinceName);
 			            	break;
 			            case 1:
 			            	cityName = simpliedName+","+linkWord;
-			            	provience.put(cityName, new HashMap<String, HashMap>());
-			            	city = provience.get(cityName);
+			            	province.put(cityName, new HashMap<String, HashMap>());
+			            	city = province.get(cityName);
 			            	break;
 			            case 2:
 			            	countryName = simpliedName+","+linkWord;
@@ -57,7 +61,7 @@ public class Mask {
 			            	break;
 			            case 3:
 			            	cityName = simpliedName+","+linkWord;
-			            	provience.put(cityName, null);
+			            	province.put(cityName, null);
 			            	break;
 		            }
 		        }
@@ -111,7 +115,7 @@ public class Mask {
 		public static String mask(String input) throws NoSuchAlgorithmException {
 			String standardQuickLocation = "";
 			try {
-				standardQuickLocation = mask(input, "provience");
+				standardQuickLocation = mask(input, "province");
 			} catch (NoSuchAlgorithmException e) {
 				e.printStackTrace();
 			}
@@ -123,7 +127,7 @@ public class Mask {
 			try {
 				int count=0;
 				switch (level) {
-					case "provience": count = 1; break;
+					case "province": count = 1; break;
 					case "city": count = 2; break;
 					case "country": count = 3; break;
 					default: break;
@@ -152,7 +156,7 @@ public class Mask {
 			} catch (NoSuchAlgorithmException e) {
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
-				System.out.println("The value of level should be chosen in provience/city/country.");
+				System.out.println("The value of level should be chosen in province/city/country.");
 				e.printStackTrace();
 			}
 			return StandardQuickLocation;

@@ -12,7 +12,7 @@ public class Demo_MaskLocation {
 				"河北省邢台临西","四川省成都市","重庆市沙坪坝区","江苏省南京市雨花台区"};
 		MaskLocation.setLocationsName();
 		for (int i=0;i<examples.length;i++) {
-			String StandardTime = MaskLocation.mask(examples[i], "provience");
+			String StandardTime = MaskLocation.mask(examples[i], "province");
 			System.out.printf("index: %d, example location sequence: %s, standard location sequence: %s\n", i, examples[i], StandardTime);
 		}
 	}

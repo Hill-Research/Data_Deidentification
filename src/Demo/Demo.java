@@ -11,16 +11,7 @@ class Demo {
 
   private static void callProcessor(final File file) throws IOException, NoSuchAlgorithmException {
     String fileName = file.getName();
-    switch (fileName) {
-      case "tb_patientinfo.txt": {
-        processor.process("tb_patientinfo");
-        break;
-      }
-      default: {
-        System.out.format("We don't know how to process data file %s!\n", fileName);
-//                System.exit(-1);
-      }
-    }
+    processor.process(fileName);
   }
 
   public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
