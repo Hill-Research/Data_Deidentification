@@ -132,10 +132,19 @@ public class Mask {
 				
 				String[] StandardLocationSeries = getStandardLocation(input, base);
 				StringBuffer StandardLocationBuffer = new StringBuffer();
-				for(int k = 0; k < count; k++) {
+				for(int k = 0; k < StandardLocationSeries.length; k++) {
 					String LocationElement = StandardLocationSeries[k];
 					if (LocationElement == null) continue;
-					else StandardLocationBuffer.append(LocationElement);
+					else {
+						if (k<count) StandardLocationBuffer.append(LocationElement);
+						else {
+							StringBuffer stars = new StringBuffer();
+							for (int i=0;i <LocationElement.length(); i++) {
+								stars.append("*");
+							}
+							StandardLocationBuffer.append(stars.toString());
+						}
+					}
 				}
 				StandardQuickLocation = StandardLocationBuffer.toString();
 				StandardQuickLocation.replace("高开区","高新技术产业开发区");
