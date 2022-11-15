@@ -13,6 +13,8 @@ public class Hash {
     return salt;
   }
 
+  //TODO: make sure the same input always has the same hash value
+  // (i.e., use the same salt)
   public static String hash(String input) throws NoSuchAlgorithmException {
     String generatedPassword = null;
     byte[] salt = getSalt();

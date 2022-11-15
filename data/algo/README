@@ -1,6 +1,6 @@
 0: keep raw
 1: delete
 2: blur time
-3: blur age
+3: blur number
 4: mask addr
 5: hash
