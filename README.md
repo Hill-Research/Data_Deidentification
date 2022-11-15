@@ -20,9 +20,27 @@ import Blur.BlurTime;
 String Time = "20200102"// "2020-01-02"// "2020年1月1日"
 String level = "year"//"month"//"day";
 String standardTime = BlurTime.blur(Time, level); // return the most possible result.
-Vector<String> standardTimes = BlurTime.blurs(Time, level); // return all results.
+String standardTime = BlurTime.blur(Time); // similar to BlurTime.blur, The default value of level is "year".
 
 // standardTime will be null if the time string is infeasible.
+```
+
+### Iterface for Blur Algorithm on Number
+In **src/** directory, run the following command:
+```
+javac Demo/Demo_BlurNumber.java;
+java Demo/Demo_BlurNumber;
+```
+Explanation for Blur Algorithm on Number:
+```
+import Blur.BlurNumber;
+
+String Number = "2年"// "12岁"// "30克"
+String level = "10"// "5"// "2"; // the length of range
+String standardNumber = BlurNumber.blur(Time, level); // return the most possible result.
+String standardNumber = BlurNumber.blur(Time); // similar to BlurNumber.blur, The default value of level is "10".
+
+// standardNumber will be null if the time string is infeasible.
 ```
 
 ### Iterface for Mask Algorithm on Address
