@@ -82,19 +82,26 @@ public class Processor {
 
     MaskLocation.setLocationsName();
     String record = dataReader.readLine();
-    while ((record != null) && !record.isEmpty()) {
+    while ((record != null)) {
+      if (record.isEmpty()) {
+        record = dataReader.readLine();
+        continue;
+      }
       String[] keywords = record.split("\\s+");
       int numKeywords = keywords.length;
+      if (numKeywords == 0) {
+        record = dataReader.readLine();
+        continue;
+      }
       int algoSize = algoMap.size();
       if (numKeywords != algoSize) {
         System.out.printf("%s (%d) and its algo file (%d) have mismatched number of records!\n",
             fileName, numKeywords, algoSize);
         System.out.printf("record: %s\n", record);
         for (int i = 0; i < numKeywords; i++) {
-          System.out.printf("%d: %s\n", i+3, keywords[i]);
+          System.out.printf("%d: %s\n", i + 3, keywords[i]);
         }
-        return;
-//        System.exit(-1);
+        System.exit(-1);
       }
       int index = 0;
       for (Map.Entry<String, Integer> algoMapIt : algoMap.entrySet()) {
