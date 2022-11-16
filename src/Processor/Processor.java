@@ -1,8 +1,9 @@
 package Processor;
 
-import Algorithm.Blur;
+import Algorithm.Blur.BlurNumber;
+import Algorithm.Blur.BlurTime;
 import Algorithm.Hash;
-import Algorithm.Mask;
+import Algorithm.Mask.MaskLocation;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -79,7 +80,7 @@ public class Processor {
     File dataFile = new File("../data/sample/" + fileName);
     BufferedReader dataReader = new BufferedReader(new FileReader(dataFile));
 
-    Mask.MaskLocation.setLocationsName();
+    MaskLocation.setLocationsName();
     String record = dataReader.readLine();
     while ((record != null) && !record.isEmpty()) {
       String[] keywords = record.split("\\s+");
@@ -108,15 +109,15 @@ public class Processor {
           case 1:
             break;
           case 2:
-            String blurTime = Blur.BlurTime.blur(keyword, "month");
+            String blurTime = BlurTime.blur(keyword, "month");
             print(blurTime);
             break;
           case 3:
-            String blurAge = Blur.BlurAge.blur(keyword);
+            String blurAge = BlurNumber.blur(keyword);
             print(blurAge);
             break;
           case 4:
-            String maskAddr = Mask.MaskLocation.mask(keyword);
+            String maskAddr = MaskLocation.mask(keyword);
             print(maskAddr);
             break;
           case 5:
