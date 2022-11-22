@@ -29,7 +29,7 @@ ZYDM                0
 ZYMC                0
 HYZKDM              0
 HYZKMC              0
-XZZDH               4
+XZZDH               1
 XZZ                 4
 XZZYB               1
 HKDZ                4
