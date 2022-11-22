@@ -85,7 +85,7 @@ public class Processor {
   private void generateOutput(final String fileName) {
     String outputFile = "../" + result_directory + fileName;
     if (verbose) {
-      System.out.printf("outputFile: %s\n", outputFile);
+      System.out.printf("Start to generate outputFile: %s\n", outputFile);
     }
     File deIdFile = new File(outputFile);
     if (deIdFile.exists()) {
@@ -131,6 +131,9 @@ public class Processor {
 
   private void readAlgo(final String fileName, Map<String, Integer> algoMap) {
     verifyAlgoFile(fileName);
+    if (verbose) {
+      System.out.printf("Read algo file %s.\n", fileName);
+    }
     File algoFile = new File("../" + algo_directory + fileName);
     try {
       BufferedReader algoReader = new BufferedReader(new FileReader(algoFile));
@@ -148,6 +151,9 @@ public class Processor {
 
   private void readData(final String fileName, Map<String, Integer> algoMap) {
     verifyDataFile(fileName);
+    if (verbose) {
+      System.out.printf("Read data file %s.\n", fileName);
+    }
     File dataFile = new File("../" + data_directory + fileName);
     try {
       BufferedReader dataReader = new BufferedReader(new FileReader(dataFile));
@@ -260,6 +266,7 @@ public class Processor {
       algo_directory = prop.getProperty("algo_directory");
       data_directory = prop.getProperty("data_directory");
       if (verbose) {
+        System.out.print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
         System.out.printf("Start to process data table %s.\n", fileName);
       }
       String baseName = extractBaseName(fileName);
@@ -268,6 +275,10 @@ public class Processor {
       readAlgo(baseName + "_algo.txt", algoMap);
       readData(baseName + ".txt", algoMap);
       bw.close();
+      if (verbose) {
+        System.out.printf("Done processing data table %s.\n", fileName);
+        System.out.print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n\n");
+      }
     } catch (Exception e) {
       System.out.printf("Fail to process data table %s!\n", fileName);
       e.printStackTrace();
