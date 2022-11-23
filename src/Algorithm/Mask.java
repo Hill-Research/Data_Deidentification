@@ -11,26 +11,34 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class Mask {
-	public class MaskLocation {
-		@SuppressWarnings("rawtypes")
-		static HashMap<String,HashMap> base = null;
 
-		public MaskLocation() throws NoSuchAlgorithmException {
-			setLocationsName();
+	public static class MaskLocation {
+
+		@SuppressWarnings("rawtypes")
+		static HashMap<String, HashMap> base = null;
+
+		static {
+			try {
+				setLocationsName();
+			} catch (NoSuchAlgorithmException e) {
+				System.out.print("Could not find the right MaskLocation block!\n");
+				e.printStackTrace();
+				System.exit(-1);
+			}
 		}
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		public static void setLocationsName() throws NoSuchAlgorithmException{
+		@SuppressWarnings({"rawtypes", "unchecked"})
+		public static void setLocationsName() throws NoSuchAlgorithmException {
 			final File file = new File("../data/location.csv");
 			file.setReadable(true);
-		    BufferedReader reader;
-	        HashMap<String, HashMap> china = new HashMap<String, HashMap>();
+			BufferedReader reader;
+			HashMap<String, HashMap> china = new HashMap<String, HashMap>();
 			try {
 				reader = new BufferedReader(new FileReader(file));
-		        String record = null;
-		        
-		        HashMap<String, HashMap> province = null;
-		        HashMap<String, HashMap> city = null;
+				String record = null;
+
+				HashMap<String, HashMap> province = null;
+				HashMap<String, HashMap> city = null;
 		        String provinceName = null;
 		        String cityName = null;
 		        String countryName = null;

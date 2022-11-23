@@ -157,13 +157,6 @@ public class Processor {
     File dataFile = new File("../" + data_directory + fileName);
     try {
       BufferedReader dataReader = new BufferedReader(new FileReader(dataFile));
-      try {
-        MaskLocation.setLocationsName();
-      } catch (NoSuchAlgorithmException e) {
-        System.out.print("No algorithm for MaskLocation!\n");
-        e.printStackTrace();
-        System.exit(-1);
-      }
       String record = dataReader.readLine();
       while ((record != null)) {
         if (record.isEmpty()) {
