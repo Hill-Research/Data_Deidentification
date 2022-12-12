@@ -41,8 +41,7 @@ public class Processor {
     FileInputStream propsInput = new FileInputStream(configFilePath);
     prop = new Properties();
     prop.load(propsInput);
-    String classpath = Processor.class.getProtectionDomain().getCodeSource().getLocation()
-        .getPath();
+    String classpath = Processor.class.getProtectionDomain().getCodeSource().getLocation().getPath();
     result_directory = classpath + prop.getProperty("result_directory");
     File resultFold = new File(result_directory);
     logger.info("result dir " + resultFold.getAbsolutePath());

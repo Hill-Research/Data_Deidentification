@@ -1,6 +1,7 @@
 package com.dupreytherapeutics.Algorithm;
 
 import com.dupreytherapeutics.Demo.Main;
+import com.dupreytherapeutics.Processor.Processor;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -37,7 +38,8 @@ public class Hash {
       FileInputStream propsInput = new FileInputStream(configFilePath);
       Properties prop = new Properties();
       prop.load(propsInput);
-      String hash_salt_cache_directory = prop.getProperty("hash_salt_cache_directory");
+      String classpath = Processor.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+      String hash_salt_cache_directory = classpath + prop.getProperty("hash_salt_cache_directory");
       createDirIfNotExist(hash_salt_cache_directory);
       String salt_file = prop.getProperty("salt_file");
       saltFile = new File(hash_salt_cache_directory + salt_file);
