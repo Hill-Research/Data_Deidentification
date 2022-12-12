@@ -1,4 +1,4 @@
-package com.dupreytherapeutics.Generator;
+package com.dupreytherapeutics.SampleGenerator;
 
 import java.util.List;
 import java.util.Random;

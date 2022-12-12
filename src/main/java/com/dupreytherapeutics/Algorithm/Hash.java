@@ -38,7 +38,8 @@ public class Hash {
       FileInputStream propsInput = new FileInputStream(configFilePath);
       Properties prop = new Properties();
       prop.load(propsInput);
-      String classpath = Processor.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+      String classpath =
+          Processor.class.getProtectionDomain().getCodeSource().getLocation().getPath();
       String hash_salt_cache_directory = classpath + prop.getProperty("hash_salt_cache_directory");
       createDirIfNotExist(hash_salt_cache_directory);
       String salt_file = prop.getProperty("salt_file");
@@ -58,7 +59,7 @@ public class Hash {
         System.exit(-1);
       }
     } else {
-      logger.info("Already exist hash dir "+ dirName);
+      logger.info("Already exist hash dir " + dirName);
     }
   }
 
@@ -100,7 +101,7 @@ public class Hash {
 
   public static void readSaltFile(final File saltFile) {
 
-      logger.info("Read1 hash salt file " + saltFile.getAbsolutePath());
+    logger.info("Read1 hash salt file " + saltFile.getAbsolutePath());
 
     try {
       if (!saltFile.exists()) {

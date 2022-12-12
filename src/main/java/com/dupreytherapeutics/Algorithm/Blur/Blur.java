@@ -7,5 +7,4 @@ interface Blur {
   String blur(String input) throws NoSuchAlgorithmException;
 
   String blur(String input, String level) throws NoSuchAlgorithmException;
-
 }

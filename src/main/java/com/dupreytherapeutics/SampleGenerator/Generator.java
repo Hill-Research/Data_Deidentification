@@ -1,4 +1,4 @@
-package com.dupreytherapeutics.Generator;
+package com.dupreytherapeutics.SampleGenerator;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -72,11 +72,9 @@ class Generator {
     } catch (IOException ioe) {
       System.err.println("IOException: " + ioe.getMessage());
     }
-
   }
 
   public static void main(String[] args) throws IOException {
     gen_tb_inp_order();
   }
 }
-

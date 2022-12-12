@@ -9,7 +9,6 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 public class Main {
 
   static Processor processor;
@@ -29,7 +28,7 @@ public class Main {
     logger.info("sample dir: " + folder.getName());
     File[] listOfFiles = folder.listFiles();
     if (listOfFiles == null) {
-      logger.error("We could not find any data files in "+ folder.getName());
+      logger.error("We could not find any data files in " + folder.getName());
       System.exit(-1);
     }
     processor = new Processor();

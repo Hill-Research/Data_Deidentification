@@ -24,15 +24,12 @@ import org.apache.logging.log4j.Logger;
 
 public class Processor {
 
-  private BufferedWriter bw;
-
+  private static final Logger logger = LogManager.getLogger(Processor.class);
   private final String result_directory;
+  private final Properties prop;
+  private BufferedWriter bw;
   private String algo_directory;
   private String data_directory;
-
-  private final Properties prop;
-
-  private static final Logger logger = LogManager.getLogger(Processor.class);
 
   public Processor() throws IOException {
     URL configURL = Main.class.getClassLoader().getResource("config.properties");
@@ -41,7 +38,8 @@ public class Processor {
     FileInputStream propsInput = new FileInputStream(configFilePath);
     prop = new Properties();
     prop.load(propsInput);
-    String classpath = Processor.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+    String classpath =
+        Processor.class.getProtectionDomain().getCodeSource().getLocation().getPath();
     result_directory = classpath + prop.getProperty("result_directory");
     File resultFold = new File(result_directory);
     logger.info("result dir " + resultFold.getAbsolutePath());
@@ -101,7 +99,7 @@ public class Processor {
 
   private void generateOutput(final String fileName) {
     String outputFile = result_directory + fileName;
-      logger.info("Start to generate outputFile: " + outputFile);
+    logger.info("Start to generate outputFile: " + outputFile);
     File deIdFile = new File(outputFile);
     logger.info("deid path: " + deIdFile.getAbsolutePath());
     if (deIdFile.exists()) {
@@ -148,7 +146,7 @@ public class Processor {
   private void readAlgo(final String fileName, Map<String, Integer> algoMap)
       throws URISyntaxException {
     verifyAlgoFile(fileName);
-      logger.info("Read algo file " + fileName);
+    logger.info("Read algo file " + fileName);
     URL algoURL = Main.class.getClassLoader().getResource(algo_directory + fileName);
     assert algoURL != null;
     File algoFile = new File(algoURL.toURI());
@@ -169,7 +167,7 @@ public class Processor {
   private void readData(final String fileName, Map<String, Integer> algoMap)
       throws URISyntaxException {
     verifyDataFile(fileName);
-      logger.info("Read data file " + fileName);
+    logger.info("Read data file " + fileName);
     URL dataURL = Main.class.getClassLoader().getResource(data_directory + fileName);
     assert dataURL != null;
     File dataFile = new File(dataURL.toURI());
@@ -191,7 +189,12 @@ public class Processor {
         }
         int algoSize = algoMap.size();
         if (numKeywords != algoSize) {
-          logger.error(fileName + " (" + numKeywords + ") and its algo file (" + algoSize
+          logger.error(
+              fileName
+                  + " ("
+                  + numKeywords
+                  + ") and its algo file ("
+                  + algoSize
                   + ") have mismatched number of records!");
           logger.error("record: " + record);
           for (int i = 0; i < numKeywords; i++) {
@@ -201,7 +204,7 @@ public class Processor {
         }
         int index = 0;
         for (Map.Entry<String, Integer> algoMapIt : algoMap.entrySet()) {
-          //TODO: this code might be useful when we access the database
+          // TODO: this code might be useful when we access the database
           String code = algoMapIt.getKey();
           int algo = algoMapIt.getValue();
           String keyword = keywords[index];
@@ -268,12 +271,12 @@ public class Processor {
   }
 
   public void process(final String fileName) {
-                    verifyDataFile(fileName);
+    verifyDataFile(fileName);
     try {
       algo_directory = prop.getProperty("algo_directory");
       data_directory = prop.getProperty("data_directory");
-        logger.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
-        logger.info("Start to process data table " + fileName);
+      logger.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
+      logger.info("Start to process data table " + fileName);
       String baseName = extractBaseName(fileName);
       logger.info("baseName: " + baseName);
       generateOutput(baseName + "_deid.txt");
@@ -281,8 +284,8 @@ public class Processor {
       readAlgo(baseName + "_algo.txt", algoMap);
       readData(baseName + ".txt", algoMap);
       bw.close();
-        logger.info("Done processing data table " + fileName);
-        logger.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n\n");
+      logger.info("Done processing data table " + fileName);
+      logger.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n\n");
 
     } catch (Exception e) {
       logger.error("Fail to process data table " + fileName);

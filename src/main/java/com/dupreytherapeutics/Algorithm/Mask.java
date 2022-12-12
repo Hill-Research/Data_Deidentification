@@ -21,6 +21,7 @@ public class Mask {
 
     @SuppressWarnings("rawtypes")
     static HashMap<String, HashMap> base = null;
+
     private static final Logger logger = LogManager.getLogger(Mask.class);
 
     static {
@@ -94,7 +95,6 @@ public class Mask {
       } catch (URISyntaxException e) {
         e.printStackTrace();
       }
-
     }
 
     @SuppressWarnings("rawtypes")

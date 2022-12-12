@@ -8,10 +8,22 @@ import org.apache.logging.log4j.Logger;
 public class BlurTime implements Blur {
   private static final Logger logger = LogManager.getLogger(BlurTime.class);
 
-  private int[][] splits = {{0, 4, 6, 8}, {0, 4, 6, 7}, {0, 4, 5, 7}, {0, 4, 6, 6},
-      {0, 4, 5, 6}, {0, 2, 4, 6}, {0, 4, 5, 5}, {0, 2, 3, 5},
-      {0, 2, 4, 5}, {0, 4, 4, 4}, {0, 2, 4, 4}, {0, 2, 3, 4},
-      {0, 2, 3, 3}, {0, 2, 2, 2}};
+  private int[][] splits = {
+    {0, 4, 6, 8},
+    {0, 4, 6, 7},
+    {0, 4, 5, 7},
+    {0, 4, 6, 6},
+    {0, 4, 5, 6},
+    {0, 2, 4, 6},
+    {0, 4, 5, 5},
+    {0, 2, 3, 5},
+    {0, 2, 4, 5},
+    {0, 4, 4, 4},
+    {0, 2, 4, 4},
+    {0, 2, 3, 4},
+    {0, 2, 3, 3},
+    {0, 2, 2, 2}
+  };
   private int[] daysLeapYear = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   private int[] daysNonLeapYear = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   private String[] linkWord = {"年", "月", "日"};
@@ -83,8 +95,10 @@ public class BlurTime implements Blur {
         break;
       }
       int spaceValue = spaceLocations.get(k);
-      if (spaceValue != split[0] && spaceValue != split[1] &&
-          spaceValue != split[2] && spaceValue != split[3]) {
+      if (spaceValue != split[0]
+          && spaceValue != split[1]
+          && spaceValue != split[2]
+          && spaceValue != split[3]) {
         isAvailable = false;
       }
     }
@@ -108,9 +122,11 @@ public class BlurTime implements Blur {
       if (!comparePositionofSpace(spaceLocations, split)) {
         continue;
       }
-      String[] ymdString = {Time.substring(split[0], split[1]),
-          Time.substring(split[1], split[2]),
-          Time.substring(split[2], split[3])};
+      String[] ymdString = {
+        Time.substring(split[0], split[1]),
+        Time.substring(split[1], split[2]),
+        Time.substring(split[2], split[3])
+      };
       if (checkStandardTime(ymdString)) {
         StandardTimeSeries = ymdString;
         isStandard = true;
