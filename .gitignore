@@ -1,5 +1,7 @@
 *.class
 .idea/
 Data_Deidentification.iml
-data/result/
-src/Algorithm/.cache/
+target/
+src/main/java/com/dupreytherapeutics/Algorithm/.cache/
+
+
