@@ -1,9 +1,10 @@
-package Processor;
+package com.dupreytherapeutics.Processor;
 
-import Algorithm.Blur.BlurNumber;
-import Algorithm.Blur.BlurTime;
-import Algorithm.Hash;
-import Algorithm.Mask.MaskLocation;
+import com.dupreytherapeutics.Algorithm.Blur.BlurNumber;
+import com.dupreytherapeutics.Algorithm.Blur.BlurTime;
+import com.dupreytherapeutics.Algorithm.Hash;
+import com.dupreytherapeutics.Algorithm.Mask.MaskLocation;
+import com.dupreytherapeutics.Demo.Main;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,6 +13,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,12 +25,24 @@ public class Processor {
   private BufferedWriter bw;
   private boolean verbose;
 
-  private String result_directory;
+  private final String result_directory;
   private String algo_directory;
   private String data_directory;
 
-  public Processor() {
-    File resultFold = new File("../" + result_directory);
+  private final Properties prop;
+
+  public Processor() throws IOException {
+    URL configURL = Main.class.getClassLoader().getResource("config.properties");
+    assert configURL != null;
+    String configFilePath = configURL.getPath();
+    FileInputStream propsInput = new FileInputStream(configFilePath);
+    prop = new Properties();
+    prop.load(propsInput);
+    String classpath = Processor.class.getProtectionDomain().getCodeSource().getLocation()
+        .getPath();
+    result_directory = classpath + prop.getProperty("result_directory");
+    File resultFold = new File(result_directory);
+    System.out.printf("result dir: %s\n", resultFold.getAbsolutePath());
     if (resultFold.exists()) {
       String[] files = resultFold.list();
       if (files != null) {
@@ -83,11 +98,12 @@ public class Processor {
   }
 
   private void generateOutput(final String fileName) {
-    String outputFile = "../" + result_directory + fileName;
+    String outputFile = result_directory + fileName;
     if (verbose) {
       System.out.printf("Start to generate outputFile: %s\n", outputFile);
     }
     File deIdFile = new File(outputFile);
+    System.out.printf("deid path: %s\n", deIdFile.getAbsolutePath());
     if (deIdFile.exists()) {
       if (!deIdFile.delete()) {
         System.out.printf("Fail to delete the history result file for %s!\n", fileName);
@@ -129,12 +145,16 @@ public class Processor {
     }
   }
 
-  private void readAlgo(final String fileName, Map<String, Integer> algoMap) {
+  private void readAlgo(final String fileName, Map<String, Integer> algoMap)
+      throws URISyntaxException {
     verifyAlgoFile(fileName);
+
     if (verbose) {
       System.out.printf("Read algo file %s.\n", fileName);
     }
-    File algoFile = new File("../" + algo_directory + fileName);
+    URL algoURL = Main.class.getClassLoader().getResource(algo_directory + fileName);
+    assert algoURL != null;
+    File algoFile = new File(algoURL.toURI());
     try {
       BufferedReader algoReader = new BufferedReader(new FileReader(algoFile));
       String record;
@@ -149,15 +169,20 @@ public class Processor {
     }
   }
 
-  private void readData(final String fileName, Map<String, Integer> algoMap) {
+  private void readData(final String fileName, Map<String, Integer> algoMap)
+      throws URISyntaxException {
     verifyDataFile(fileName);
     if (verbose) {
       System.out.printf("Read data file %s.\n", fileName);
     }
-    File dataFile = new File("../" + data_directory + fileName);
+    URL dataURL = Main.class.getClassLoader().getResource(data_directory + fileName);
+    assert dataURL != null;
+    File dataFile = new File(dataURL.toURI());
     try {
       BufferedReader dataReader = new BufferedReader(new FileReader(dataFile));
       String record = dataReader.readLine();
+      BlurTime blurTimeEngine = new BlurTime();
+      BlurNumber blurNumberEngine = new BlurNumber();
       while ((record != null)) {
         if (record.isEmpty()) {
           record = dataReader.readLine();
@@ -193,7 +218,7 @@ public class Processor {
               break;
             case 2:
               try {
-                String blurTime = BlurTime.blur(keyword, "month");
+                String blurTime = blurTimeEngine.blur(keyword, "month");
                 print(blurTime);
               } catch (NoSuchAlgorithmException e) {
                 System.out.print("No algorithm for BlurTime!\n");
@@ -203,7 +228,7 @@ public class Processor {
               break;
             case 3:
               try {
-                String blurAge = BlurNumber.blur(keyword);
+                String blurAge = blurNumberEngine.blur(keyword);
                 print(blurAge);
               } catch (NoSuchAlgorithmException e) {
                 System.out.print("No algorithm for BlurAge!\n");
@@ -249,13 +274,8 @@ public class Processor {
 
   public void process(final String fileName) {
     verifyDataFile(fileName);
-    String configFilePath = "Common/config.properties";
     try {
-      FileInputStream propsInput = new FileInputStream(configFilePath);
-      Properties prop = new Properties();
-      prop.load(propsInput);
       verbose = Boolean.parseBoolean(prop.getProperty("verbose"));
-      result_directory = prop.getProperty("result_directory");
       algo_directory = prop.getProperty("algo_directory");
       data_directory = prop.getProperty("data_directory");
       if (verbose) {
@@ -263,6 +283,7 @@ public class Processor {
         System.out.printf("Start to process data table %s.\n", fileName);
       }
       String baseName = extractBaseName(fileName);
+      System.out.printf("baseName:%s\n", baseName);
       generateOutput(baseName + "_deid.txt");
       Map<String, Integer> algoMap = new LinkedHashMap<>();
       readAlgo(baseName + "_algo.txt", algoMap);

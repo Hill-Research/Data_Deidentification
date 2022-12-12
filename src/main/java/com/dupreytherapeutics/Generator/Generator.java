@@ -1,4 +1,4 @@
-package Generator;
+package com.dupreytherapeutics.Generator;
 
 import java.io.FileWriter;
 import java.io.IOException;

@@ -1,8 +1,8 @@
-package Demo;
+package com.dupreytherapeutics.Demo;
 
 import java.security.NoSuchAlgorithmException;
 
-import Algorithm.Mask.MaskLocation;
+import com.dupreytherapeutics.Algorithm.Mask.MaskLocation;
 
 public class Demo_MaskLocation {
 	public static void main(String[] args) throws NoSuchAlgorithmException {

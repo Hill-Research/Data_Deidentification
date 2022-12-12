@@ -1,5 +1,6 @@
-package Algorithm;
+package com.dupreytherapeutics.Algorithm;
 
+import com.dupreytherapeutics.Demo.Main;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -8,6 +9,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -26,7 +28,9 @@ public class Hash {
 
   static {
     saltMap = new HashMap<>();
-    String configFilePath = "Common/config.properties";
+    URL configURL = Main.class.getClassLoader().getResource("config.properties");
+    assert configURL != null;
+    String configFilePath = configURL.getPath();
     try {
       FileInputStream propsInput = new FileInputStream(configFilePath);
       Properties prop = new Properties();
