@@ -1,10 +1,12 @@
 package com.dupreytherapeutics.Demo;
 
-import java.security.NoSuchAlgorithmException;
-
 import com.dupreytherapeutics.Algorithm.Mask.MaskLocation;
+import java.security.NoSuchAlgorithmException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Demo_MaskLocation {
+	private static final Logger logger = LogManager.getLogger(Demo_MaskLocation.class);
 	public static void main(String[] args) throws NoSuchAlgorithmException {
 		String[] examples = {"中国河北省邢台市威县","河北邢台临西","河北省邢台威县","河北省邢台",
 				"河北邢台市","北京市","河北邯郸永年","河北邯郸临西县","中国浙江省杭州市西湖区黄龙溪路",
@@ -13,7 +15,7 @@ public class Demo_MaskLocation {
 		MaskLocation.setLocationsName();
 		for (int i=0;i<examples.length;i++) {
 			String StandardTime = MaskLocation.mask(examples[i], "province");
-			System.out.printf("index: %d, example location sequence: %s, standard location sequence: %s\n", i, examples[i], StandardTime);
+			logger.info("index: %d, example location sequence: %s, standard location sequence: %s\n", i, examples[i], StandardTime);
 		}
 	}
 }

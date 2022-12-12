@@ -2,8 +2,11 @@ package com.dupreytherapeutics.Algorithm.Blur;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Vector;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class BlurTime implements Blur {
+  private static final Logger logger = LogManager.getLogger(BlurTime.class);
 
   private int[][] splits = {{0, 4, 6, 8}, {0, 4, 6, 7}, {0, 4, 5, 7}, {0, 4, 6, 6},
       {0, 4, 5, 6}, {0, 2, 4, 6}, {0, 4, 5, 5}, {0, 2, 3, 5},
@@ -170,7 +173,7 @@ public class BlurTime implements Blur {
     } catch (NoSuchAlgorithmException e) {
       e.printStackTrace();
     } catch (IllegalArgumentException e) {
-      System.out.println("The value of level should be chosen in year/month/day.");
+      logger.error("The value of level should be chosen in year/month/day.");
       e.printStackTrace();
     }
     return StandardTime;

@@ -12,6 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Mask {
 
@@ -19,12 +21,13 @@ public class Mask {
 
     @SuppressWarnings("rawtypes")
     static HashMap<String, HashMap> base = null;
+    private static final Logger logger = LogManager.getLogger(Mask.class);
 
     static {
       try {
         setLocationsName();
       } catch (Exception e) {
-        System.out.print("Could not find the right MaskLocation block!\n");
+        logger.error("Could not find the right MaskLocation block!\n");
         e.printStackTrace();
         System.exit(-1);
       }
@@ -198,7 +201,7 @@ public class Mask {
       } catch (NoSuchAlgorithmException e) {
         e.printStackTrace();
       } catch (IllegalArgumentException e) {
-        System.out.println("The value of level should be chosen in province/city/country.");
+        logger.error("The value of level should be chosen in province/city/country.");
         e.printStackTrace();
       }
       return StandardQuickLocation;

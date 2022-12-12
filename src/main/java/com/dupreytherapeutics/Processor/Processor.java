@@ -19,17 +19,20 @@ import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Processor {
 
   private BufferedWriter bw;
-  private boolean verbose;
 
   private final String result_directory;
   private String algo_directory;
   private String data_directory;
 
   private final Properties prop;
+
+  private static final Logger logger = LogManager.getLogger(Processor.class);
 
   public Processor() throws IOException {
     URL configURL = Main.class.getClassLoader().getResource("config.properties");
@@ -42,48 +45,48 @@ public class Processor {
         .getPath();
     result_directory = classpath + prop.getProperty("result_directory");
     File resultFold = new File(result_directory);
-    System.out.printf("result dir: %s\n", resultFold.getAbsolutePath());
+    logger.info("result dir " + resultFold.getAbsolutePath());
     if (resultFold.exists()) {
       String[] files = resultFold.list();
       if (files != null) {
         for (String file : files) {
           File currentFile = new File(resultFold.getPath(), file);
           if (!currentFile.delete()) {
-            System.out.printf("Fail to delete the history result file %s!\n", currentFile);
+            logger.error("Fail to delete the history result file " + currentFile);
             System.exit(-1);
           }
         }
       }
 
       if (!resultFold.delete()) {
-        System.out.print("Fail to delete the result directory!\n");
+        logger.error("Fail to delete the result directory!\n");
         System.exit(-1);
       }
     }
     if (!resultFold.mkdirs()) {
-      System.out.print("Fail to create the result directory!\n");
+      logger.error("Fail to create the result directory!\n");
       System.exit(-1);
     }
   }
 
   private void verifyDataFile(final String dataFileName) {
     if (dataFileName.indexOf("tb_") != 0) {
-      System.out.printf("data file %s does not have the right prefix!\n", dataFileName);
+      logger.error("data file " + dataFileName + " does not have the right prefix!");
       System.exit(-1);
     }
     if (!dataFileName.endsWith(".txt")) {
-      System.out.printf("data file %s does not have the right suffix!\n", dataFileName);
+      logger.error("data file " + dataFileName + " does not have the right suffix!");
       System.exit(-1);
     }
   }
 
   private void verifyAlgoFile(final String dataFileName) {
     if (dataFileName.indexOf("tb_") != 0) {
-      System.out.printf("algo file %s does not have the right prefix!\n", dataFileName);
+      logger.error("algo file " + dataFileName + " does not have the right prefix!");
       System.exit(-1);
     }
     if (!dataFileName.endsWith("_algo.txt")) {
-      System.out.printf("algo file %s does not have the right suffix!\n", dataFileName);
+      logger.error("algo file " + dataFileName + " does not have the right suffix!");
       System.exit(-1);
     }
   }
@@ -91,7 +94,7 @@ public class Processor {
   private String extractBaseName(final String dataFileName) {
     int N = dataFileName.length();
     if (N <= 4) {
-      System.out.printf("data file %s does not have the right length!\n", dataFileName);
+      logger.error("data file " + dataFileName + " does not have the right length!");
       System.exit(-1);
     }
     return dataFileName.substring(0, dataFileName.length() - 4);
@@ -99,24 +102,22 @@ public class Processor {
 
   private void generateOutput(final String fileName) {
     String outputFile = result_directory + fileName;
-    if (verbose) {
-      System.out.printf("Start to generate outputFile: %s\n", outputFile);
-    }
+      logger.info("Start to generate outputFile: " + outputFile);
     File deIdFile = new File(outputFile);
-    System.out.printf("deid path: %s\n", deIdFile.getAbsolutePath());
+    logger.info("deid path: " + deIdFile.getAbsolutePath());
     if (deIdFile.exists()) {
       if (!deIdFile.delete()) {
-        System.out.printf("Fail to delete the history result file for %s!\n", fileName);
+        logger.error("Fail to delete the history result file for " + fileName);
         System.exit(-1);
       }
     }
     try {
       if (!deIdFile.createNewFile()) {
-        System.out.printf("Fail to create the result file for %s!\n", fileName);
+        logger.error("Fail to create the result file for " + fileName);
         System.exit(-1);
       }
     } catch (Exception e) {
-      System.out.printf("Have exception when creating the result file for %s!\n", fileName);
+      logger.error("Have exception when creating the result file for " + fileName);
       e.printStackTrace();
       System.exit(-1);
     }
@@ -124,7 +125,7 @@ public class Processor {
       FileOutputStream fileOutput = new FileOutputStream(deIdFile);
       bw = new BufferedWriter(new OutputStreamWriter(fileOutput));
     } catch (Exception e) {
-      System.out.printf("Have exception when creating BufferWriter for %s!\n", fileName);
+      logger.error("Have exception when creating BufferWriter for " + fileName);
       e.printStackTrace();
       System.exit(-1);
     }
@@ -132,14 +133,14 @@ public class Processor {
 
   private void print(String element) {
     if (element.isEmpty()) {
-      System.out.print("Try to insert null element!\n");
+      logger.error("Try to insert null element!\n");
       System.exit(-1);
     }
     try {
       bw.write(element);
       bw.write(" ");
     } catch (IOException e) {
-      System.out.printf("Fail to write element %s!\n", element);
+      logger.error("Fail to write element " + element);
       e.printStackTrace();
       System.exit(-1);
     }
@@ -148,10 +149,7 @@ public class Processor {
   private void readAlgo(final String fileName, Map<String, Integer> algoMap)
       throws URISyntaxException {
     verifyAlgoFile(fileName);
-
-    if (verbose) {
-      System.out.printf("Read algo file %s.\n", fileName);
-    }
+      logger.info("Read algo file " + fileName);
     URL algoURL = Main.class.getClassLoader().getResource(algo_directory + fileName);
     assert algoURL != null;
     File algoFile = new File(algoURL.toURI());
@@ -163,7 +161,7 @@ public class Processor {
         algoMap.put(keywords[0], Integer.valueOf(keywords[1]));
       }
     } catch (IOException e) {
-      System.out.printf("Fail to read algo file %s!\n", fileName);
+      logger.error("Fail to read algo file " + fileName);
       e.printStackTrace();
       System.exit(-1);
     }
@@ -172,9 +170,7 @@ public class Processor {
   private void readData(final String fileName, Map<String, Integer> algoMap)
       throws URISyntaxException {
     verifyDataFile(fileName);
-    if (verbose) {
-      System.out.printf("Read data file %s.\n", fileName);
-    }
+      logger.info("Read data file " + fileName);
     URL dataURL = Main.class.getClassLoader().getResource(data_directory + fileName);
     assert dataURL != null;
     File dataFile = new File(dataURL.toURI());
@@ -196,11 +192,11 @@ public class Processor {
         }
         int algoSize = algoMap.size();
         if (numKeywords != algoSize) {
-          System.out.printf("%s (%d) and its algo file (%d) have mismatched number of records!\n",
-              fileName, numKeywords, algoSize);
-          System.out.printf("record: %s\n", record);
+          logger.error(fileName + " (" + numKeywords + ") and its algo file (" + algoSize
+                  + ") have mismatched number of records!");
+          logger.error("record: " + record);
           for (int i = 0; i < numKeywords; i++) {
-            System.out.printf("%d: %s\n", i + 3, keywords[i]);
+            logger.error((i + 3) + ": " + keywords[i]);
           }
           System.exit(-1);
         }
@@ -221,7 +217,7 @@ public class Processor {
                 String blurTime = blurTimeEngine.blur(keyword, "month");
                 print(blurTime);
               } catch (NoSuchAlgorithmException e) {
-                System.out.print("No algorithm for BlurTime!\n");
+                logger.error("No algorithm for BlurTime!\n");
                 e.printStackTrace();
                 System.exit(-1);
               }
@@ -231,7 +227,7 @@ public class Processor {
                 String blurAge = blurNumberEngine.blur(keyword);
                 print(blurAge);
               } catch (NoSuchAlgorithmException e) {
-                System.out.print("No algorithm for BlurAge!\n");
+                logger.error("No algorithm for BlurAge!\n");
                 e.printStackTrace();
                 System.exit(-1);
               }
@@ -241,7 +237,7 @@ public class Processor {
                 String maskAddr = MaskLocation.mask(keyword);
                 print(maskAddr);
               } catch (NoSuchAlgorithmException e) {
-                System.out.print("No algorithm for MaskLocation!\n");
+                logger.error("No algorithm for MaskLocation!\n");
                 e.printStackTrace();
                 System.exit(-1);
               }
@@ -251,13 +247,13 @@ public class Processor {
                 String hash_keyword = Hash.hash(keyword);
                 print(hash_keyword);
               } catch (NoSuchAlgorithmException e) {
-                System.out.print("No algorithm for Hash!\n");
+                logger.error("No algorithm for Hash!\n");
                 e.printStackTrace();
                 System.exit(-1);
               }
               break;
             default:
-              System.out.printf("Unknown algo id %d!\n", algo);
+              logger.error("Unknown algo id " + algo);
               System.exit(-1);
           }
           index++;
@@ -266,35 +262,31 @@ public class Processor {
         record = dataReader.readLine();
       }
     } catch (IOException e) {
-      System.out.printf("Have exception when reading data file %s!\n", fileName);
+      logger.error("Have exception when reading data file " + fileName);
       e.printStackTrace();
       System.exit(-1);
     }
   }
 
   public void process(final String fileName) {
-    verifyDataFile(fileName);
+                    verifyDataFile(fileName);
     try {
-      verbose = Boolean.parseBoolean(prop.getProperty("verbose"));
       algo_directory = prop.getProperty("algo_directory");
       data_directory = prop.getProperty("data_directory");
-      if (verbose) {
-        System.out.print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
-        System.out.printf("Start to process data table %s.\n", fileName);
-      }
+        logger.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
+        logger.info("Start to process data table " + fileName);
       String baseName = extractBaseName(fileName);
-      System.out.printf("baseName:%s\n", baseName);
+      logger.info("baseName: " + baseName);
       generateOutput(baseName + "_deid.txt");
       Map<String, Integer> algoMap = new LinkedHashMap<>();
       readAlgo(baseName + "_algo.txt", algoMap);
       readData(baseName + ".txt", algoMap);
       bw.close();
-      if (verbose) {
-        System.out.printf("Done processing data table %s.\n", fileName);
-        System.out.print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n\n");
-      }
+        logger.info("Done processing data table " + fileName);
+        logger.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n\n");
+
     } catch (Exception e) {
-      System.out.printf("Fail to process data table %s!\n", fileName);
+      logger.error("Fail to process data table " + fileName);
       e.printStackTrace();
       System.exit(-1);
     }

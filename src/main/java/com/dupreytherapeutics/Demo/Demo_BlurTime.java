@@ -1,10 +1,12 @@
 package com.dupreytherapeutics.Demo;
 
-import java.security.NoSuchAlgorithmException;
 import com.dupreytherapeutics.Algorithm.Blur.BlurTime;
+import java.security.NoSuchAlgorithmException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Demo_BlurTime {
-
+	private static final Logger logger = LogManager.getLogger(Demo_BlurTime.class);
 	public static void main(String[] args) throws NoSuchAlgorithmException {
 		String[] examples = {"000000","20070701171207","20070907161105",
 				"2022年0108","2001年2月15日","20040507","2012-11-20",
@@ -17,7 +19,7 @@ public class Demo_BlurTime {
 		BlurTime blurTimeEngine = new BlurTime();
 		for (int i=0;i<examples.length;i++) {
 			String StandardTime = blurTimeEngine.blur(examples[i],"month");
-			System.out.printf("index: %d, example time sequence: %s, standard time sequence: %s\n", i, examples[i], StandardTime);
+			logger.info("index: %d, example time sequence: %s, standard time sequence: %s\n", i, examples[i], StandardTime);
 		}
 	}
 }

@@ -18,13 +18,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Hash {
 
   private static final Map<String, byte[]> saltMap;
 
   private static File saltFile;
-  private static boolean verbose;
+  private static final Logger logger = LogManager.getLogger(Hash.class);
 
   static {
     saltMap = new HashMap<>();
@@ -35,7 +37,6 @@ public class Hash {
       FileInputStream propsInput = new FileInputStream(configFilePath);
       Properties prop = new Properties();
       prop.load(propsInput);
-      verbose = Boolean.parseBoolean(prop.getProperty("verbose"));
       String hash_salt_cache_directory = prop.getProperty("hash_salt_cache_directory");
       createDirIfNotExist(hash_salt_cache_directory);
       String salt_file = prop.getProperty("salt_file");
@@ -49,13 +50,13 @@ public class Hash {
   private static void createDirIfNotExist(String dirName) {
     File cacheDir = new File(dirName);
     if (!cacheDir.exists()) {
-      System.out.printf("Create hash dir %s\n", dirName);
+      logger.info("Create hash dir " + dirName);
       if (!cacheDir.mkdirs()) {
-        System.out.print("Fail to create the cache dir for hash_salt!\n");
+        logger.error("Fail to create the cache dir for hash_salt!\n");
         System.exit(-1);
       }
     } else {
-      System.out.printf("Already exist hash dir %s\n", dirName);
+      logger.info("Already exist hash dir "+ dirName);
     }
   }
 
@@ -73,11 +74,11 @@ public class Hash {
 
   private static void print(String element, byte[] salt) {
     if (element.isEmpty()) {
-      System.out.print("Try to insert null hash key!\n");
+      logger.error("Try to insert null hash key!\n");
       System.exit(-1);
     }
     if (salt.length == 0) {
-      System.out.print("Try to insert null hash salt!\n");
+      logger.error("Try to insert null hash salt!\n");
       System.exit(-1);
     }
     try {
@@ -96,18 +97,18 @@ public class Hash {
   }
 
   public static void readSaltFile(final File saltFile) {
-    if (verbose) {
-      System.out.printf("Read1 hash salt file %s\n", saltFile.getAbsolutePath());
-    }
+
+      logger.info("Read1 hash salt file " + saltFile.getAbsolutePath());
+
     try {
       if (!saltFile.exists()) {
         if (!saltFile.createNewFile()) {
-          System.out.printf("Fail to create the hash salt file %s!\n", saltFile.getAbsolutePath());
+          logger.error("Fail to create the hash salt file " + saltFile.getAbsolutePath());
           System.exit(-1);
         }
       }
     } catch (Exception e) {
-      System.out.print("Have exception when creating the hash salt file!\n");
+      logger.error("Have exception when creating the hash salt file!\n");
       e.printStackTrace();
       System.exit(-1);
     }
@@ -117,15 +118,15 @@ public class Hash {
       while ((record = saltReader.readLine()) != null) {
         String[] keywords = record.split(":");
         if (keywords.length != 2) {
-          System.out.printf("We found invalid hash salt record with len %d!\n", keywords.length);
-          System.out.print(record);
+          logger.error("We found invalid hash salt record with len %d!\n", keywords.length);
+          logger.error(record);
           System.exit(-1);
         }
         saltMap.put(keywords[0], keywords[1].getBytes());
       }
       saltReader.close();
     } catch (IOException e) {
-      System.out.print("Fail to read hash salt file!\n");
+      logger.error("Fail to read hash salt file!\n");
       e.printStackTrace();
       System.exit(-1);
     }

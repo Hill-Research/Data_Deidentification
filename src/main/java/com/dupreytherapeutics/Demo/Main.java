@@ -6,10 +6,14 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 public class Main {
 
   static Processor processor;
+  private static final Logger logger = LogManager.getLogger(Main.class);
 
   private static void callProcessor(final File file) throws IOException, NoSuchAlgorithmException {
     String fileName = file.getName();
@@ -18,23 +22,23 @@ public class Main {
 
   public static void main(String[] args)
       throws IOException, NoSuchAlgorithmException, URISyntaxException {
-    System.out.println("This is the data de-identification demo.\n");
+    logger.info("This is the data de-identification demo.\n");
     URL sampleURL = Main.class.getClassLoader().getResource("data/sample");
     assert sampleURL != null;
     final File folder = new File(sampleURL.toURI());
-    System.out.printf("sample dir: %s\n", folder.getName());
+    logger.info("sample dir: " + folder.getName());
     File[] listOfFiles = folder.listFiles();
     if (listOfFiles == null) {
-      System.out.format("We could not find any data files in %s!", folder.getName());
+      logger.error("We could not find any data files in "+ folder.getName());
       System.exit(-1);
     }
     processor = new Processor();
     for (File file : listOfFiles) {
       if (!file.isFile()) {
-        System.out.format("We found abnormal file %s!", file.getName());
+        logger.error("We found abnormal file " + file.getName());
         System.exit(-1);
       }
-      System.out.printf("file: %s\n", file.getName());
+      logger.info("file: " + file.getName());
       callProcessor(file);
     }
   }
