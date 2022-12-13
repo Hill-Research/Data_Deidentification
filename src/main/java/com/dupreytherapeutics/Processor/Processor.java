@@ -128,7 +128,7 @@ public class Processor {
     }
   }
 
-  private void print(String element) {
+  private void writeToDeIdFile(String element) {
     if (element.isEmpty()) {
       logger.error("Try to insert null element!\n");
       System.exit(-1);
@@ -176,6 +176,7 @@ public class Processor {
       String record = dataReader.readLine();
       BlurTime blurTimeEngine = new BlurTime();
       BlurNumber blurNumberEngine = new BlurNumber();
+      MaskLocation maskLocationEngine = new MaskLocation();
       while ((record != null)) {
         if (record.isEmpty()) {
           record = dataReader.readLine();
@@ -210,14 +211,14 @@ public class Processor {
           String keyword = keywords[index];
           switch (algo) {
             case 0:
-              print(keyword);
+              writeToDeIdFile(keyword);
               break;
             case 1:
               break;
             case 2:
               try {
                 String blurTime = blurTimeEngine.blur(keyword, "month");
-                print(blurTime);
+                writeToDeIdFile(blurTime);
               } catch (NoSuchAlgorithmException e) {
                 logger.error("No algorithm for BlurTime!\n");
                 e.printStackTrace();
@@ -227,7 +228,7 @@ public class Processor {
             case 3:
               try {
                 String blurAge = blurNumberEngine.blur(keyword);
-                print(blurAge);
+                writeToDeIdFile(blurAge);
               } catch (NoSuchAlgorithmException e) {
                 logger.error("No algorithm for BlurAge!\n");
                 e.printStackTrace();
@@ -236,8 +237,8 @@ public class Processor {
               break;
             case 4:
               try {
-                String maskAddr = MaskLocation.mask(keyword);
-                print(maskAddr);
+                String maskAddr = maskLocationEngine.mask(keyword);
+                writeToDeIdFile(maskAddr);
               } catch (NoSuchAlgorithmException e) {
                 logger.error("No algorithm for MaskLocation!\n");
                 e.printStackTrace();
@@ -247,7 +248,7 @@ public class Processor {
             case 5:
               try {
                 String hash_keyword = Hash.hash(keyword);
-                print(hash_keyword);
+                writeToDeIdFile(hash_keyword);
               } catch (NoSuchAlgorithmException e) {
                 logger.error("No algorithm for Hash!\n");
                 e.printStackTrace();
@@ -260,7 +261,7 @@ public class Processor {
           }
           index++;
         }
-        print("\n");
+        writeToDeIdFile("\n");
         record = dataReader.readLine();
       }
     } catch (IOException e) {

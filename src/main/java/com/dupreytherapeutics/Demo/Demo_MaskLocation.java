@@ -29,9 +29,10 @@ public class Demo_MaskLocation {
       "重庆市沙坪坝区",
       "江苏省南京市雨花台区"
     };
-    MaskLocation.setLocationsName();
+    MaskLocation maskLocationEngine = new MaskLocation();
+    maskLocationEngine.initLocationHierarchy();
     for (int i = 0; i < examples.length; i++) {
-      String StandardTime = MaskLocation.mask(examples[i], "province");
+      String StandardTime = maskLocationEngine.mask(examples[i], "province");
       logger.info(
           "index: %d, example location sequence: %s, standard location sequence: %s\n",
           i, examples[i], StandardTime);

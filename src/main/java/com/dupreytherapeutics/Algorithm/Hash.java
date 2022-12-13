@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,11 +23,14 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/** This class implements the hashing algorithm for input string. */
 public class Hash {
 
   private static final Map<String, byte[]> saltMap;
 
+  /** the salt file used by the {@link Hash} block */
   private static File saltFile;
+
   private static final Logger logger = LogManager.getLogger(Hash.class);
 
   static {
@@ -45,11 +49,22 @@ public class Hash {
       String salt_file = prop.getProperty("salt_file");
       saltFile = new File(hash_salt_cache_directory + salt_file);
       readSaltFile(saltFile);
-    } catch (Exception e) {
+    } catch (FileNotFoundException e) {
+      logger.error("We did not find the config/salt files for the hash block!");
       e.printStackTrace();
+      System.exit(-1);
+    } catch (IOException e) {
+      logger.error("We fail to create cache directory for the hash salt file!\n");
+      e.printStackTrace();
+      System.exit(-1);
     }
   }
 
+  /**
+   * Create the directory if it does not exist
+   *
+   * @param dirName the name of the directory which needs to exist
+   */
   private static void createDirIfNotExist(String dirName) {
     File cacheDir = new File(dirName);
     if (!cacheDir.exists()) {
@@ -63,6 +78,13 @@ public class Hash {
     }
   }
 
+  /**
+   * Get the hash salt for the input string. Note that for the same input string, it always needs to
+   * use the same salt when doing the hashing, so we need to cache the salt if it is newly generated
+   *
+   * @param input input string
+   * @return the hash salt
+   */
   private static byte[] getSalt(String input) {
     if (saltMap.containsKey(input)) {
       return saltMap.get(input);
@@ -71,11 +93,17 @@ public class Hash {
     byte[] salt = new byte[16];
     random.nextBytes(salt);
     saltMap.put(input, salt);
-    print(input, salt);
+    writeToSaltFile(input, salt);
     return salt;
   }
 
-  private static void print(String element, byte[] salt) {
+  /**
+   * Write the <input string, salt> pair to the cache file
+   *
+   * @param element input string
+   * @param salt the newly generated salt for the input string
+   */
+  private static void writeToSaltFile(String element, byte[] salt) {
     if (element.isEmpty()) {
       logger.error("Try to insert null hash key!\n");
       System.exit(-1);
@@ -95,10 +123,17 @@ public class Hash {
       out.close();
       bw.close();
     } catch (IOException e) {
+      logger.error("Fail with salt cache file!");
       e.printStackTrace();
+      System.exit(-1);
     }
   }
 
+  /**
+   * read the salt cache file and extract the existing <input string, salt> pairs
+   *
+   * @param saltFile the salt cache file
+   */
   public static void readSaltFile(final File saltFile) {
 
     logger.info("Read1 hash salt file " + saltFile.getAbsolutePath());
@@ -121,7 +156,7 @@ public class Hash {
       while ((record = saltReader.readLine()) != null) {
         String[] keywords = record.split(":");
         if (keywords.length != 2) {
-          logger.error("We found invalid hash salt record with len %d!\n", keywords.length);
+          logger.error("We found invalid hash salt record with len " + keywords.length);
           logger.error(record);
           System.exit(-1);
         }
@@ -135,6 +170,13 @@ public class Hash {
     }
   }
 
+  /**
+   * Run the hashing algorithm on the input string. It is using SHA-512 by default.
+   *
+   * @param input input string
+   * @return the hash value
+   * @throws NoSuchAlgorithmException if the specified hash algorithm does not exist
+   */
   public static String hash(String input) throws NoSuchAlgorithmException {
     String generatedPassword;
     byte[] salt = getSalt(input);
