@@ -50,6 +50,7 @@ public class BlurNumber implements Blur {
    * @throws NoSuchAlgorithmException when the corresponding blur block is not found.
    */
   public String blur(String input, String level) throws NoSuchAlgorithmException {
+    // TODO: need to validate "level"
     int count = Integer.parseInt(level);
     int standardNumberValue = getStandardNumber(input);
     int period = standardNumberValue / count;

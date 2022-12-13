@@ -16,15 +16,12 @@ import java.util.Map.Entry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * This class implements the interface {@link Mask} for location info.
- * TODO: make it singleton
- */
+/** This class implements the interface {@link Mask} for location info. TODO: make it singleton */
 public class MaskLocation implements Mask {
 
   /* hierarchical location info for each country */
   @SuppressWarnings("rawtypes")
-   HashMap<String, HashMap> base;
+  HashMap<String, HashMap> base;
 
   private static final Logger logger = LogManager.getLogger(Mask.class);
 
@@ -39,12 +36,13 @@ public class MaskLocation implements Mask {
   }
 
   /**
-   * Read in location file and initialize the location hierarchy for the given country.
-   * Note that the location has hierarchical structure, such as: 国->省->市->县, Country->State->City->Town
+   * Read in location file and initialize the location hierarchy for the given country. Note that
+   * the location has hierarchical structure, such as: 国->省->市->县, Country->State->City->Town
+   *
    * @throws NoSuchAlgorithmException if we cannot handle the location file.
    */
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public  void initLocationHierarchy() throws NoSuchAlgorithmException {
+  public void initLocationHierarchy() throws NoSuchAlgorithmException {
     try {
       URL locationURL = Main.class.getClassLoader().getResource("data/location.csv");
       assert locationURL != null;
@@ -117,8 +115,8 @@ public class MaskLocation implements Mask {
   }
 
   /**
-   * Check if the given location is of standard format or not.
-   * TODO: add more explanations
+   * Check if the given location is of standard format or not. TODO: add more explanations
+   *
    * @param location location string
    * @param map the hierarchical location map of a given country
    * @return TODO: explain the return value
@@ -149,13 +147,14 @@ public class MaskLocation implements Mask {
 
   /**
    * Given the input location, convert it into standard form: [province, city, country]
+   *
    * @param input location string
    * @param fathermap the hierarchical location map of a given country
    * @return the standard form of input location
    * @throws NoSuchAlgorithmException if the given location string cannot be processed
    */
   @SuppressWarnings({"rawtypes", "unchecked"})
-  private  String[] getStandardLocation(String input, HashMap<String, HashMap> fathermap)
+  private String[] getStandardLocation(String input, HashMap<String, HashMap> fathermap)
       throws NoSuchAlgorithmException {
     String[] StandardLocationSeries = new String[3];
     String Location = input.replaceAll("([^\\u4e00-\\u9fa5])", "");
@@ -182,9 +181,10 @@ public class MaskLocation implements Mask {
 
   /**
    * Mask the location info from input string with default level "province"
+   *
    * @param input input string with sensitive location info
    * @return masked string
-   * @throws NoSuchAlgorithmException
+   * @throws NoSuchAlgorithmException if the given location string cannot be processed
    */
   public String mask(String input) throws NoSuchAlgorithmException {
     String standardQuickLocation = "";
@@ -199,10 +199,12 @@ public class MaskLocation implements Mask {
   }
 
   /**
-   * Mask the location info from input string with default level "province"
+   * Mask the location info from input string with explicitly specified level from [province, city,
+   * country]
+   *
    * @param input input string with sensitive location info
    * @return masked string
-   * @throws NoSuchAlgorithmException
+   * @throws NoSuchAlgorithmException if the given location string cannot be processed
    */
   public String mask(String input, String level) throws NoSuchAlgorithmException {
     String StandardQuickLocation = "";
@@ -219,14 +221,12 @@ public class MaskLocation implements Mask {
           count = 3;
           break;
         default:
-          break;
-      }
-      if (count == 0) {
-        throw new IllegalArgumentException();
+          logger.error("Unknown mask level " + level);
+          System.exit(-1);
       }
 
       String[] StandardLocationSeries = getStandardLocation(input, base);
-      StringBuffer StandardLocationBuffer = new StringBuffer();
+      StringBuilder StandardLocationBuffer = new StringBuilder();
       for (int k = 0; k < StandardLocationSeries.length; k++) {
         String LocationElement = StandardLocationSeries[k];
         if (LocationElement == null) {
@@ -235,7 +235,7 @@ public class MaskLocation implements Mask {
           if (k < count) {
             StandardLocationBuffer.append(LocationElement);
           } else {
-            StringBuffer stars = new StringBuffer();
+            StringBuilder stars = new StringBuilder();
             for (int i = 0; i < LocationElement.length(); i++) {
               stars.append("*");
             }

@@ -7,7 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /** This class implements the interface {@link Blur} for Time item. */
-//TODO: make it singleton
+// TODO: make it singleton
 public class BlurTime implements Blur {
   private static final Logger logger = LogManager.getLogger(BlurTime.class);
 
@@ -227,12 +227,9 @@ public class BlurTime implements Blur {
           count = 3;
           break;
         default:
-          break;
+          logger.error("Unknown blur level " + level);
+          System.exit(-1);
       }
-      if (count == 0) {
-        throw new IllegalArgumentException();
-      }
-
       String[] StandardTimeSeries = getStandardTime(input);
       StringBuilder StandardTimeBuffer = new StringBuilder();
       for (int k = 0; k < count; k++) {

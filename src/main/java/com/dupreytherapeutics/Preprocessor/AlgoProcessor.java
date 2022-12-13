@@ -8,6 +8,7 @@ import java.util.Arrays;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+
 public class AlgoProcessor {
 
   private static final int maxAlgoCodeLen = 20;
