@@ -44,7 +44,7 @@ public class MaskLocation implements Mask {
   @SuppressWarnings({"rawtypes", "unchecked"})
   public void initLocationHierarchy() throws NoSuchAlgorithmException {
     try {
-      URL locationURL = Main.class.getClassLoader().getResource("data/location.csv");
+      URL locationURL = MaskLocation.class.getClassLoader().getResource("data/location.csv");
       assert locationURL != null;
       final File file = new File(locationURL.toURI());
       if (!file.setReadable(true)) {

@@ -4,7 +4,6 @@ import com.dupreytherapeutics.Algorithm.Blur.BlurNumber;
 import com.dupreytherapeutics.Algorithm.Blur.BlurTime;
 import com.dupreytherapeutics.Algorithm.Hash;
 import com.dupreytherapeutics.Algorithm.Mask.MaskLocation;
-import com.dupreytherapeutics.Demo.Main;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,6 +21,9 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * This class does de-identification processing for each data file
+ */
 public class Processor {
 
   private static final Logger logger = LogManager.getLogger(Processor.class);
@@ -31,8 +33,12 @@ public class Processor {
   private String algo_directory;
   private String data_directory;
 
+  /**
+   * Constructor. It reads in the config file, and extracts the result directory location which will be used to store the deid table files. If the result directory already exists, it will <pre>remove the existing directory and create a new one</pre>.
+   * @throws IOException when it fails to manipulate with the result directory
+   */
   public Processor() throws IOException {
-    URL configURL = Main.class.getClassLoader().getResource("config.properties");
+    URL configURL = Processor.class.getClassLoader().getResource("config.properties");
     assert configURL != null;
     String configFilePath = configURL.getPath();
     FileInputStream propsInput = new FileInputStream(configFilePath);
@@ -66,6 +72,13 @@ public class Processor {
     }
   }
 
+  /**
+   * Check if the data file is valid, which includes:
+   * 1) the data file name should start with "tb_"
+   * 2) the data file name should end with ".txt"
+   *
+   * @param dataFileName input data file name
+   */
   private void verifyDataFile(final String dataFileName) {
     if (dataFileName.indexOf("tb_") != 0) {
       logger.error("data file " + dataFileName + " does not have the right prefix!");
@@ -77,17 +90,32 @@ public class Processor {
     }
   }
 
-  private void verifyAlgoFile(final String dataFileName) {
-    if (dataFileName.indexOf("tb_") != 0) {
-      logger.error("algo file " + dataFileName + " does not have the right prefix!");
+  /**
+   * Check if the algo file is valid, which includes:
+   * 1) the algo file name should start with "tb_"
+   * 2) the algo file name should end with "_algo.txt"
+   *
+   * @param algoFileName input algo file name
+   */
+  private void verifyAlgoFile(final String algoFileName) {
+    if (algoFileName.indexOf("tb_") != 0) {
+      logger.error("algo file " + algoFileName + " does not have the right prefix!");
       System.exit(-1);
     }
-    if (!dataFileName.endsWith("_algo.txt")) {
-      logger.error("algo file " + dataFileName + " does not have the right suffix!");
+    if (!algoFileName.endsWith("_algo.txt")) {
+      logger.error("algo file " + algoFileName + " does not have the right suffix!");
       System.exit(-1);
     }
   }
 
+  /**
+   * Extract the base name (i.e., the table name) from input data file name.
+   * For example, if the input file name is "tb_patient_info.txt", then the base name is
+   * "tb_patient_info"
+   *
+   * @param dataFileName input data file name
+   * @return the base name
+   */
   private String extractBaseName(final String dataFileName) {
     int N = dataFileName.length();
     if (N <= 4) {
@@ -97,24 +125,28 @@ public class Processor {
     return dataFileName.substring(0, dataFileName.length() - 4);
   }
 
-  private void generateOutput(final String fileName) {
-    String outputFile = result_directory + fileName;
+  /**
+   * generate the de-identification file for the input data file
+   * @param dataFileName input data file name
+   */
+  private void genDeIdOutputFile(final String dataFileName) {
+    String outputFile = result_directory + dataFileName;
     logger.info("Start to generate outputFile: " + outputFile);
     File deIdFile = new File(outputFile);
     logger.info("deid path: " + deIdFile.getAbsolutePath());
     if (deIdFile.exists()) {
       if (!deIdFile.delete()) {
-        logger.error("Fail to delete the history result file for " + fileName);
+        logger.error("Fail to delete the history result file for " + dataFileName);
         System.exit(-1);
       }
     }
     try {
       if (!deIdFile.createNewFile()) {
-        logger.error("Fail to create the result file for " + fileName);
+        logger.error("Fail to create the result file for " + dataFileName);
         System.exit(-1);
       }
     } catch (Exception e) {
-      logger.error("Have exception when creating the result file for " + fileName);
+      logger.error("Have exception when creating the result file for " + dataFileName);
       e.printStackTrace();
       System.exit(-1);
     }
@@ -122,12 +154,16 @@ public class Processor {
       FileOutputStream fileOutput = new FileOutputStream(deIdFile);
       bw = new BufferedWriter(new OutputStreamWriter(fileOutput));
     } catch (Exception e) {
-      logger.error("Have exception when creating BufferWriter for " + fileName);
+      logger.error("Have exception when creating BufferWriter for " + dataFileName);
       e.printStackTrace();
       System.exit(-1);
     }
   }
 
+  /**
+   * Write one de-identified element to the de-identification file
+   * @param element the de-identified element to be written
+   */
   private void writeToDeIdFile(String element) {
     if (element.isEmpty()) {
       logger.error("Try to insert null element!\n");
@@ -143,11 +179,17 @@ public class Processor {
     }
   }
 
-  private void readAlgo(final String fileName, Map<String, Integer> algoMap)
+  /**
+   * Read in the algo file, and store the de-identification algorithm for each element
+   * @param algoFileName input algo file name
+   * @param algoMap the map which stores the de-identification algorithm for each element
+   * @throws URISyntaxException if error happens for getting the URI of the algo file
+   */
+  private void readAlgoFile(final String algoFileName, Map<String, Integer> algoMap)
       throws URISyntaxException {
-    verifyAlgoFile(fileName);
-    logger.info("Read algo file " + fileName);
-    URL algoURL = Main.class.getClassLoader().getResource(algo_directory + fileName);
+    verifyAlgoFile(algoFileName);
+    logger.info("Read algo file " + algoFileName);
+    URL algoURL = Processor.class.getClassLoader().getResource(algo_directory + algoFileName);
     assert algoURL != null;
     File algoFile = new File(algoURL.toURI());
     try {
@@ -158,17 +200,24 @@ public class Processor {
         algoMap.put(keywords[0], Integer.valueOf(keywords[1]));
       }
     } catch (IOException e) {
-      logger.error("Fail to read algo file " + fileName);
+      logger.error("Fail to read algo file " + algoFileName);
       e.printStackTrace();
       System.exit(-1);
     }
   }
 
-  private void readData(final String fileName, Map<String, Integer> algoMap)
+  /**
+   * Run de-identification operations on each record from input data file
+   *
+   * @param dataFileName input data file name
+   * @param algoMap the map which stores the de-identification algorithm for each record in the data file
+   * @throws URISyntaxException if error happens for getting the URI of the data file
+   */
+  private void deIdentifyDataFile(final String dataFileName, Map<String, Integer> algoMap)
       throws URISyntaxException {
-    verifyDataFile(fileName);
-    logger.info("Read data file " + fileName);
-    URL dataURL = Main.class.getClassLoader().getResource(data_directory + fileName);
+    verifyDataFile(dataFileName);
+    logger.info("Read data file " + dataFileName);
+    URL dataURL = Processor.class.getClassLoader().getResource(data_directory + dataFileName);
     assert dataURL != null;
     File dataFile = new File(dataURL.toURI());
     try {
@@ -191,7 +240,7 @@ public class Processor {
         int algoSize = algoMap.size();
         if (numKeywords != algoSize) {
           logger.error(
-              fileName
+              dataFileName
                   + " ("
                   + numKeywords
                   + ") and its algo file ("
@@ -205,8 +254,7 @@ public class Processor {
         }
         int index = 0;
         for (Map.Entry<String, Integer> algoMapIt : algoMap.entrySet()) {
-          // TODO: this code might be useful when we access the database
-          String code = algoMapIt.getKey();
+          String code = algoMapIt.getKey();  // this code might be useful when we access the database
           int algo = algoMapIt.getValue();
           String keyword = keywords[index];
           switch (algo) {
@@ -265,31 +313,39 @@ public class Processor {
         record = dataReader.readLine();
       }
     } catch (IOException e) {
-      logger.error("Have exception when reading data file " + fileName);
+      logger.error("Have exception when reading data file " + dataFileName);
       e.printStackTrace();
       System.exit(-1);
     }
   }
 
-  public void process(final String fileName) {
-    verifyDataFile(fileName);
+  /**
+   * Process the input data file, including:
+   * 1) read in its corresponding de-identification algo file
+   * 2) generate the de-identification file for the input data file
+   * 3) apply the de-identification algorithm on each record in the data file, and write the result to the de-id file
+   *
+   * @param dataFileName input data file name
+   */
+  public void process(final String dataFileName) {
+    verifyDataFile(dataFileName);
     try {
       algo_directory = prop.getProperty("algo_directory");
       data_directory = prop.getProperty("data_directory");
       logger.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
-      logger.info("Start to process data table " + fileName);
-      String baseName = extractBaseName(fileName);
+      logger.info("Start to process data table " + dataFileName);
+      String baseName = extractBaseName(dataFileName);
       logger.info("baseName: " + baseName);
-      generateOutput(baseName + "_deid.txt");
+      genDeIdOutputFile(baseName + "_deid.txt");
       Map<String, Integer> algoMap = new LinkedHashMap<>();
-      readAlgo(baseName + "_algo.txt", algoMap);
-      readData(baseName + ".txt", algoMap);
+      readAlgoFile(baseName + "_algo.txt", algoMap);
+      deIdentifyDataFile(baseName + ".txt", algoMap);
       bw.close();
-      logger.info("Done processing data table " + fileName);
+      logger.info("Done processing data table " + dataFileName);
       logger.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n\n");
 
     } catch (Exception e) {
-      logger.error("Fail to process data table " + fileName);
+      logger.error("Fail to process data table " + dataFileName);
       e.printStackTrace();
       System.exit(-1);
     }

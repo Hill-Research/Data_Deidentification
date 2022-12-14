@@ -35,7 +35,7 @@ public class Hash {
 
   static {
     saltMap = new HashMap<>();
-    URL configURL = Main.class.getClassLoader().getResource("config.properties");
+    URL configURL = Hash.class.getClassLoader().getResource("config.properties");
     assert configURL != null;
     String configFilePath = configURL.getPath();
     try {

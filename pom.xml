@@ -75,9 +75,9 @@
               </goals>
             </execution>
           </executions>
-          <configuration>
-            <mainClass>com.dupreytherapeutics.Demo.Main</mainClass>
-          </configuration>
+<!--          <configuration>-->
+<!--            <mainClass>com.dupreytherapeutics.Demo.Main</mainClass>-->
+<!--          </configuration>-->
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
