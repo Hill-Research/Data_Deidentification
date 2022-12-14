@@ -21,9 +21,7 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * This class does de-identification processing for each data file
- */
+/** This class does de-identification processing for each data file */
 public class Processor {
 
   private static final Logger logger = LogManager.getLogger(Processor.class);
@@ -34,7 +32,13 @@ public class Processor {
   private String data_directory;
 
   /**
-   * Constructor. It reads in the config file, and extracts the result directory location which will be used to store the deid table files. If the result directory already exists, it will <pre>remove the existing directory and create a new one</pre>.
+   * Constructor. It reads in the config file, and extracts the result directory location which will
+   * be used to store the deid table files. If the result directory already exists, it will
+   *
+   * <pre>remove the existing directory and create a new one</pre>
+   *
+   * .
+   *
    * @throws IOException when it fails to manipulate with the result directory
    */
   public Processor() throws IOException {
@@ -73,8 +77,7 @@ public class Processor {
   }
 
   /**
-   * Check if the data file is valid, which includes:
-   * 1) the data file name should start with "tb_"
+   * Check if the data file is valid, which includes: 1) the data file name should start with "tb_"
    * 2) the data file name should end with ".txt"
    *
    * @param dataFileName input data file name
@@ -91,8 +94,7 @@ public class Processor {
   }
 
   /**
-   * Check if the algo file is valid, which includes:
-   * 1) the algo file name should start with "tb_"
+   * Check if the algo file is valid, which includes: 1) the algo file name should start with "tb_"
    * 2) the algo file name should end with "_algo.txt"
    *
    * @param algoFileName input algo file name
@@ -109,9 +111,8 @@ public class Processor {
   }
 
   /**
-   * Extract the base name (i.e., the table name) from input data file name.
-   * For example, if the input file name is "tb_patient_info.txt", then the base name is
-   * "tb_patient_info"
+   * Extract the base name (i.e., the table name) from input data file name. For example, if the
+   * input file name is "tb_patient_info.txt", then the base name is "tb_patient_info"
    *
    * @param dataFileName input data file name
    * @return the base name
@@ -127,6 +128,7 @@ public class Processor {
 
   /**
    * generate the de-identification file for the input data file
+   *
    * @param dataFileName input data file name
    */
   private void genDeIdOutputFile(final String dataFileName) {
@@ -162,6 +164,7 @@ public class Processor {
 
   /**
    * Write one de-identified element to the de-identification file
+   *
    * @param element the de-identified element to be written
    */
   private void writeToDeIdFile(String element) {
@@ -181,6 +184,7 @@ public class Processor {
 
   /**
    * Read in the algo file, and store the de-identification algorithm for each element
+   *
    * @param algoFileName input algo file name
    * @param algoMap the map which stores the de-identification algorithm for each element
    * @throws URISyntaxException if error happens for getting the URI of the algo file
@@ -210,7 +214,8 @@ public class Processor {
    * Run de-identification operations on each record from input data file
    *
    * @param dataFileName input data file name
-   * @param algoMap the map which stores the de-identification algorithm for each record in the data file
+   * @param algoMap the map which stores the de-identification algorithm for each record in the data
+   *     file
    * @throws URISyntaxException if error happens for getting the URI of the data file
    */
   private void deIdentifyDataFile(final String dataFileName, Map<String, Integer> algoMap)
@@ -254,7 +259,7 @@ public class Processor {
         }
         int index = 0;
         for (Map.Entry<String, Integer> algoMapIt : algoMap.entrySet()) {
-          String code = algoMapIt.getKey();  // this code might be useful when we access the database
+          String code = algoMapIt.getKey(); // this code might be useful when we access the database
           int algo = algoMapIt.getValue();
           String keyword = keywords[index];
           switch (algo) {
@@ -320,10 +325,10 @@ public class Processor {
   }
 
   /**
-   * Process the input data file, including:
-   * 1) read in its corresponding de-identification algo file
-   * 2) generate the de-identification file for the input data file
-   * 3) apply the de-identification algorithm on each record in the data file, and write the result to the de-id file
+   * Process the input data file, including: 1) read in its corresponding de-identification algo
+   * file 2) generate the de-identification file for the input data file 3) apply the
+   * de-identification algorithm on each record in the data file, and write the result to the de-id
+   * file
    *
    * @param dataFileName input data file name
    */

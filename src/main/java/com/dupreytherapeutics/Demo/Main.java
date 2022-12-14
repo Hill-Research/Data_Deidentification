@@ -22,10 +22,10 @@ public class Main {
   public static void main(String[] args)
       throws IOException, NoSuchAlgorithmException, URISyntaxException {
     logger.info("This is the data de-identification demo.\n");
-    URL sampleURL = Main.class.getClassLoader().getResource("data/sample");
+    URL sampleURL = Main.class.getClassLoader().getResource("data/db");
     assert sampleURL != null;
     final File folder = new File(sampleURL.toURI());
-    logger.info("sample dir: " + folder.getName());
+    logger.info("db dir: " + folder.getName());
     File[] listOfFiles = folder.listFiles();
     if (listOfFiles == null) {
       logger.error("We could not find any data files in " + folder.getName());

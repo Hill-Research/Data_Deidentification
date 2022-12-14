@@ -28,7 +28,7 @@ class Generator {
 
   private static void gen_tb_inp_order() {
     try {
-      String filename = "../data/sample/tb_inp_order.txt";
+      String filename = "../data/db/tb_inp_order.txt";
       FileWriter fw = new FileWriter(filename, true);
       List<String> order_names = new ArrayList<>();
       order_names.add("儿童处方");
