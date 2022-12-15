@@ -21,25 +21,25 @@ Parse_Args()
 Run()
 {
   case "$GOAL" in
-    clean)
-      mvn clean --log-file maven.log
+    reset)
+      mvn clean #--log-file maven.log
       exit;;
     compile)
-      mvn compile --log-file maven.log
+      mvn compile #--log-file maven.log
       exit;;
     run)
-      mvn compile --log-file maven.log
-      mvn exec:java -Dexec.mainClass="com.dupreytherapeutics.${PACKAGE}.${CLASS}" --log-file maven.log
+      mvn compile #--log-file maven.log
+      mvn exec:java -Dexec.mainClass="com.dupreytherapeutics.${PACKAGE}.${CLASS}" #--log-file maven.log
       exit;;
     package)
-      mvn package --log-file maven.log
+      mvn package #--log-file maven.log
       exit;;
-    gen-doc)
-      mvn site --log-file maven.log
-      mvn javadoc:javadoc --log-file maven.log
+    docgen)
+      mvn site #--log-file maven.log
+      mvn javadoc:javadoc #--log-file maven.log
       exit;;
     reformat)
-      mvn com.coveo:fmt-maven-plugin:format --log-file maven.log
+      mvn com.coveo:fmt-maven-plugin:format #--log-file maven.log
       exit;;
   esac
 }

@@ -2,7 +2,7 @@ package com.dupreytherapeutics.Processor;
 
 import com.dupreytherapeutics.Algorithm.Blur.BlurNumber;
 import com.dupreytherapeutics.Algorithm.Blur.BlurTime;
-import com.dupreytherapeutics.Algorithm.Hash;
+import com.dupreytherapeutics.Algorithm.Hash.Hash;
 import com.dupreytherapeutics.Algorithm.Mask.MaskLocation;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

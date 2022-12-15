@@ -1,4 +1,4 @@
-package com.dupreytherapeutics.Algorithm;
+package com.dupreytherapeutics.Algorithm.Hash;
 
 import com.dupreytherapeutics.Processor.Processor;
 import java.io.BufferedReader;
