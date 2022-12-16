@@ -17,8 +17,10 @@ import org.apache.logging.log4j.Logger;
  */
 public class AlgoProcessor {
 
+  /* for each code in the algo file, we specify the max lenght of the code */
   private static final int maxAlgoCodeLen = 20;
 
+  /* logging object */
   private static final Logger logger = LogManager.getLogger(AlgoProcessor.class);
 
   /**
