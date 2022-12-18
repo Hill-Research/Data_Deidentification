@@ -1,9 +1,7 @@
 package com.dupreytherapeutics.Algorithm.Mask;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -12,8 +10,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /** This class implements the interface {@link Mask} for location info. TODO: make it singleton */
 public class MaskLocation implements Mask {
@@ -22,11 +29,13 @@ public class MaskLocation implements Mask {
   @SuppressWarnings("rawtypes")
   HashMap<String, HashMap> base;
 
+  DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
   private static final Logger logger = LogManager.getLogger(Mask.class);
 
   public MaskLocation() {
     try {
       initLocationHierarchy();
+      dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
     } catch (Exception e) {
       logger.error("Could not find the right MaskLocation block!\n");
       e.printStackTrace();
@@ -43,60 +52,65 @@ public class MaskLocation implements Mask {
   @SuppressWarnings({"rawtypes", "unchecked"})
   public void initLocationHierarchy() throws NoSuchAlgorithmException {
     try {
-      URL locationURL = MaskLocation.class.getClassLoader().getResource("data/location.csv");
+      URL locationURL = MaskLocation.class.getClassLoader().getResource("data/location.xml");
       assert locationURL != null;
-      final File file = new File(locationURL.toURI());
-      if (!file.setReadable(true)) {
+      final File locFile = new File(locationURL.toURI());
+      if (!locFile.setReadable(true)) {
         logger.error("Fail to set the location.csv file to be readable!");
         System.exit(-1);
       }
-      BufferedReader reader;
-      HashMap<String, HashMap> china = new HashMap<String, HashMap>();
-
-      reader = new BufferedReader(new FileReader(file));
-      String record = null;
-
-      HashMap<String, HashMap> province = new HashMap<>();
-      HashMap<String, HashMap> city = new HashMap<>();
       String provinceName;
       String cityName;
       String countryName;
-      while ((record = reader.readLine()) != null) {
-        String[] keywords = record.split("\\t");
-        int level = Integer.parseInt(keywords[0]);
-        String name = keywords[3];
-        String mergeName = keywords[4];
-        String[] simpliedNameLinkWord = mergeName.split(",");
-        String simpliedName = simpliedNameLinkWord[simpliedNameLinkWord.length - 1];
-        String linkWord = name.replace(simpliedName, "");
-        if (linkWord == null) {
-          linkWord = "";
-        }
-        if (name.equals("市辖区") || name.equals("直辖区") || name.equals("直辖县")) {
-          continue;
-        }
-        switch (level) {
-          case 0:
-            provinceName = simpliedName + "," + linkWord;
-            china.put(provinceName, new HashMap<String, HashMap>());
-            province = china.get(provinceName);
-            break;
-          case 1:
-            cityName = simpliedName + "," + linkWord;
-            province.put(cityName, new HashMap<String, HashMap>());
-            city = province.get(cityName);
-            break;
-          case 2:
-            countryName = simpliedName + "," + linkWord;
-            city.put(countryName, null);
-            break;
-          case 3:
-            cityName = simpliedName + "," + linkWord;
-            province.put(cityName, null);
-            break;
+      HashMap<String, HashMap> province = new HashMap<>();
+      HashMap<String, HashMap> city = new HashMap<>();
+      HashMap<String, HashMap> china = new HashMap<>();
+      DocumentBuilder db = dbf.newDocumentBuilder();
+      Document doc = db.parse(locFile);
+      doc.getDocumentElement().normalize();
+      NodeList nodeList = doc.getElementsByTagName("item");
+      int len = nodeList.getLength();
+
+      for (int itr = 0; itr < len; itr++) {
+        Node node = nodeList.item(itr);
+        if (node.getNodeType() == Node.ELEMENT_NODE) {
+          Element eElement = (Element) node;
+          int level = Integer.parseInt(
+              eElement.getElementsByTagName("level").item(0).getTextContent());
+          String name = eElement.getElementsByTagName("name").item(0).getTextContent();
+          String mergeName = eElement.getElementsByTagName("merger_name").item(0).getTextContent();
+          String[] simpliedNameLinkWord = mergeName.split(",");
+          String simpliedName = simpliedNameLinkWord[simpliedNameLinkWord.length - 1];
+          String linkWord = name.replace(simpliedName, "");
+          if (name.equals("市辖区") || name.equals("直辖区") || name.equals("直辖县")) {
+            continue;
+          }
+          switch (level) {
+            case 0:
+              provinceName = simpliedName + "," + linkWord;
+              china.put(provinceName, new HashMap<String, HashMap>());
+              province = china.get(provinceName);
+              break;
+            case 1:
+              cityName = simpliedName + "," + linkWord;
+              province.put(cityName, new HashMap<String, HashMap>());
+              city = province.get(cityName);
+              break;
+            case 2:
+              countryName = simpliedName + "," + linkWord;
+              city.put(countryName, null);
+              break;
+            case 3:
+              cityName = simpliedName + "," + linkWord;
+              province.put(cityName, null);
+              break;
+          }
+          base = china;
+        } else {
+          logger.error("Unknown record in " + locFile + ": " + node.getBaseURI());
+          System.exit(-1);
         }
       }
-      base = china;
     } catch (FileNotFoundException e) {
       logger.error("Could not find the location file!");
       e.printStackTrace();
@@ -108,6 +122,14 @@ public class MaskLocation implements Mask {
       e.printStackTrace();
     } catch (URISyntaxException e) {
       logger.error("Fail with extracting the URI of the location.csv!");
+      e.printStackTrace();
+      System.exit(-1);
+    } catch (ParserConfigurationException e) {
+      logger.error("Parser configuration error!");
+      e.printStackTrace();
+      System.exit(-1);
+    } catch (SAXException e) {
+      logger.error("SAX Exception!");
       e.printStackTrace();
       System.exit(-1);
     }

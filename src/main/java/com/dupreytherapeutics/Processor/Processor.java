@@ -29,7 +29,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-/** This class does de-identification processing for each data file */
+/**
+ * This class does de-identification processing for each data file
+ */
 public class Processor {
 
   private static final Logger logger = LogManager.getLogger(Processor.class);
@@ -38,6 +40,9 @@ public class Processor {
   private BufferedWriter bw;
   private String algo_directory;
   private String data_directory;
+  private final BlurTime blurTimeEngine;
+  private final BlurNumber blurNumberEngine;
+  private final MaskLocation maskLocationEngine;
 
   DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
@@ -91,6 +96,9 @@ public class Processor {
       logger.error("Fail to create the result directory!\n");
       System.exit(-1);
     }
+    blurTimeEngine = new BlurTime();
+    blurNumberEngine = new BlurNumber();
+    maskLocationEngine = new MaskLocation();
   }
 
   /**
@@ -214,15 +222,13 @@ public class Processor {
     assert algoURL != null;
     File algoFile = new File(algoURL.toURI());
     try {
-      System.out.println(algoFile.getName());
       DocumentBuilder db = dbf.newDocumentBuilder();
       Document doc = db.parse(algoFile);
       doc.getDocumentElement().normalize();
-      System.out.println("Root element: " + doc.getDocumentElement().getNodeName());
 
       NodeList nodeList = doc.getElementsByTagName("item");
-      System.out.printf("len: %d\n", nodeList.getLength());
-      for (int itr = 0; itr < nodeList.getLength(); itr++) {
+      int len = nodeList.getLength();
+      for (int itr = 0; itr < len; itr++) {
         Node node = nodeList.item(itr);
         if (node.getNodeType() == Node.ELEMENT_NODE) {
           Element eElement = (Element) node;
@@ -261,9 +267,6 @@ public class Processor {
     try {
       BufferedReader dataReader = new BufferedReader(new FileReader(dataFile));
       String record = dataReader.readLine();
-      BlurTime blurTimeEngine = new BlurTime();
-      BlurNumber blurNumberEngine = new BlurNumber();
-      MaskLocation maskLocationEngine = new MaskLocation();
       while ((record != null)) {
         if (record.isEmpty()) {
           record = dataReader.readLine();

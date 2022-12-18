@@ -15,28 +15,21 @@ def to_xml(df):
         return '\n'.join(xml)
 
     res = '\n'.join(df.apply(row_xml, axis=1))
-    res += "\n</Algo>\n"
+    res += "\n</China_Area_Record>\n"
     return (res)
 
 
-def process_file(algoFile):
-    print(algoFile)
-    df = pd.read_csv(algoFile, header=None, delimiter=r"\s+")
-    df4 = pd.DataFrame({'Code': df.iloc[:, 0], 'AlgoNumber': df.iloc[:, 1]})
+def process_file(locFile):
+    df = pd.read_csv(locFile, header=None, delimiter=r"\s+")
+    df4 = pd.DataFrame(
+        {'level': df.iloc[:, 0], 'parent_code': df.iloc[:, 1], 'area_code': df.iloc[:, 2], 'name': df.iloc[:, 3],
+         'merger_name': df.iloc[:, 4]})
     # print(to_xml(df4))
-    output_file = "Output/" + algoFile.replace("_algo.txt", "_algo.xml")
+    output_file = "Output/location.xml"
     text_file = open(output_file, "w")
-    xmlStr = "<Algo>\n" + to_xml(df4)
+    xmlStr = "<China_Area_Record>\n" + to_xml(df4)
     text_file.write(xmlStr)
     text_file.close()
 
 
-dirpath = Path('Output')
-if dirpath.exists() and dirpath.is_dir():
-    shutil.rmtree(dirpath)
-os.mkdir("Output")
-
-arr = os.listdir('./')
-for file in arr:
-    if "_algo.txt" in file:
-        process_file(file)
+process_file('location.csv')
