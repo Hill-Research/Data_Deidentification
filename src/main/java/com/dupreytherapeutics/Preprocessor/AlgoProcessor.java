@@ -96,7 +96,7 @@ public class AlgoProcessor {
         logger.error("We found abnormal file " + file.getName());
         System.exit(-1);
       }
-      if (file.getName().contains("_algo.txt")) {
+      if (file.getName().contains("_algo.xml")) {
         logger.info("Run check on algo file " + file.getName());
         normalizeAlgoFile(file);
       }

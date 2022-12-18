@@ -18,8 +18,16 @@ import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /** This class does de-identification processing for each data file */
 public class Processor {
@@ -30,6 +38,8 @@ public class Processor {
   private BufferedWriter bw;
   private String algo_directory;
   private String data_directory;
+
+  DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
   /**
    * Constructor. It reads in the config file, and extracts the result directory location which will
@@ -42,6 +52,13 @@ public class Processor {
    * @throws IOException when it fails to manipulate with the result directory
    */
   public Processor() throws IOException {
+    try {
+      dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+    } catch (ParserConfigurationException e) {
+      logger.error("Parser configuratio error!\n");
+      e.printStackTrace();
+      System.exit(-1);
+    }
     URL configURL = Processor.class.getClassLoader().getResource("config.properties");
     assert configURL != null;
     String configFilePath = configURL.getPath();
@@ -95,7 +112,7 @@ public class Processor {
 
   /**
    * Check if the algo file is valid, which includes: 1) the algo file name should start with "tb_"
-   * 2) the algo file name should end with "_algo.txt"
+   * 2) the algo file name should end with "_algo.xml"
    *
    * @param algoFileName input algo file name
    */
@@ -104,7 +121,7 @@ public class Processor {
       logger.error("algo file " + algoFileName + " does not have the right prefix!");
       System.exit(-1);
     }
-    if (!algoFileName.endsWith("_algo.txt")) {
+    if (!algoFileName.endsWith("_algo.xml")) {
       logger.error("algo file " + algoFileName + " does not have the right suffix!");
       System.exit(-1);
     }
@@ -197,13 +214,29 @@ public class Processor {
     assert algoURL != null;
     File algoFile = new File(algoURL.toURI());
     try {
-      BufferedReader algoReader = new BufferedReader(new FileReader(algoFile));
-      String record;
-      while ((record = algoReader.readLine()) != null) {
-        String[] keywords = record.split("\\s+");
-        algoMap.put(keywords[0], Integer.valueOf(keywords[1]));
+      System.out.println(algoFile.getName());
+      DocumentBuilder db = dbf.newDocumentBuilder();
+      Document doc = db.parse(algoFile);
+      doc.getDocumentElement().normalize();
+      System.out.println("Root element: " + doc.getDocumentElement().getNodeName());
+
+      NodeList nodeList = doc.getElementsByTagName("item");
+      System.out.printf("len: %d\n", nodeList.getLength());
+      for (int itr = 0; itr < nodeList.getLength(); itr++) {
+        Node node = nodeList.item(itr);
+        if (node.getNodeType() == Node.ELEMENT_NODE) {
+          Element eElement = (Element) node;
+          String code = eElement.getElementsByTagName("Code").item(0).getTextContent();
+          int algoVal =
+              Integer.parseInt(
+                  eElement.getElementsByTagName("AlgoNumber").item(0).getTextContent());
+          algoMap.put(code, algoVal);
+        } else {
+          logger.error("Unknown record in " + algoFileName + ": " + node.getBaseURI());
+          System.exit(-1);
+        }
       }
-    } catch (IOException e) {
+    } catch (Exception e) {
       logger.error("Fail to read algo file " + algoFileName);
       e.printStackTrace();
       System.exit(-1);
@@ -343,7 +376,7 @@ public class Processor {
       logger.info("baseName: " + baseName);
       genDeIdOutputFile(baseName + "_deid.txt");
       Map<String, Integer> algoMap = new LinkedHashMap<>();
-      readAlgoFile(baseName + "_algo.txt", algoMap);
+      readAlgoFile(baseName + "_algo.xml", algoMap);
       deIdentifyDataFile(baseName + ".txt", algoMap);
       bw.close();
       logger.info("Done processing data table " + dataFileName);
