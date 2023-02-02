@@ -1,5 +1,6 @@
 *.class
 .idea/
 Data_Deidentification.iml
-data/result/
-src/Algorithm/.cache/
+target/
+*.log
+*.iml

@@ -1,4 +1,10 @@
 # Data_Deidentification
+## Prerequisites
+### Maven
+1) Download maven here: https://maven.apache.org/download.cgi
+2) Unzip maven in your local directory
+3) Add `$MAVEN_DIR/bin` to the `PATH` environment
+
 
 ### How to compile?
 In **src/** directory, run the following command:
@@ -7,13 +13,13 @@ javac Demo.java;
 java Demo;
 ```
 
-### Iterface for Blur Algorithm on Time
+### Iterface for Blur main.java.com.dupreytherapeutics.Algorithm on Time
 In **src/** directory, run the following command:
 ```
 javac Demo/Demo_BlurTime.java;
 java Demo/Demo_BlurTime;
 ```
-Explanation for Blur Algorithm on Time:
+Explanation for Blur main.java.com.dupreytherapeutics.Algorithm on Time:
 ```
 import Blur.BlurTime;
 
@@ -25,13 +31,13 @@ String standardTime = BlurTime.blur(Time); // similar to BlurTime.blur, The defa
 // standardTime will be null if the time string is infeasible.
 ```
 
-### Iterface for Blur Algorithm on Number
+### Iterface for Blur main.java.com.dupreytherapeutics.Algorithm on Number
 In **src/** directory, run the following command:
 ```
 javac Demo/Demo_BlurNumber.java;
 java Demo/Demo_BlurNumber;
 ```
-Explanation for Blur Algorithm on Number:
+Explanation for Blur main.java.com.dupreytherapeutics.Algorithm on Number:
 ```
 import Blur.BlurNumber;
 
@@ -43,13 +49,13 @@ String standardNumber = BlurNumber.blur(Time); // similar to BlurNumber.blur, Th
 // standardNumber will be null if the time string is infeasible.
 ```
 
-### Iterface for Mask Algorithm on Address
+### Iterface for Mask main.java.com.dupreytherapeutics.Algorithm on Address
 In **src/** directory, run the following command:
 ```
 javac Demo/Demo_MaskLocation.java;
 java Demo/Demo_MaskLocation;
 ```
-Explanation for Mask Algorithm on Address:
+Explanation for Mask main.java.com.dupreytherapeutics.Algorithm on Address:
 ```
 import Mask.MaskLocation;
 
